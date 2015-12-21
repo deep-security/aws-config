@@ -1,5 +1,5 @@
 # *********************************************************************
-# Deep Security - Is Instance Protected By AntiMalware?
+# Deep Security - Is Instance Protected By _______?
 # *********************************************************************
 from __future__ import print_function
 
@@ -17,8 +17,8 @@ def aws_config_rule_handler(event, context):
 	"""
 	Primary entry point for the AWS Lambda function
 
-	Verify whether or not the specified instance is protected by Deep Security's
-	anti-malware controls
+	Verify whether or not the specified instance is protected by a specific
+	Deep Security control
 
 	print() statments are for the benefit of CloudWatch logs & a nod to old school
 	debugging ;-)

@@ -1,5 +1,5 @@
 # *********************************************************************
-# Deep Security - Is Instance Protected By AntiMalware?
+# Deep Security - Does Instance Have Policy ______?
 # *********************************************************************
 from __future__ import print_function
 
@@ -17,14 +17,14 @@ def aws_config_rule_handler(event, context):
 	"""
 	Primary entry point for the AWS Lambda function
 
-	Verify whether or not the specified instance is protected by Deep Security's
-	anti-malware controls
+	Verify whether or not the specified instance is protected by a specific
+	Deep Security policy
 
 	print() statments are for the benefit of CloudWatch logs & a nod to old school
 	debugging ;-)
 	"""
 	instance_id = None
-	is_protected = False
+	has_policy = False
 	detailed_msg = ""
 
 	# Make sure the function has been called in the context of AWS Config Rules
@@ -47,6 +47,9 @@ def aws_config_rule_handler(event, context):
 			return { 'requirements_not_met': 'Function requires that you at least pass dsUsername, dsPassword, and either dsTenant or dsHostname'}
 		else:
 			print("Credentials for Deep Security passed to function successfully")
+
+	if not event['ruleParameters'].has_key('dsPolicy'):
+			return { 'requirements_not_met': 'Function requires that you specify the desired Deep Security policy to verify.' } 
 
 	# Determine if this is an EC2 instance event
 	if event.has_key('invokingEvent'):
@@ -74,10 +77,10 @@ def aws_config_rule_handler(event, context):
 			mgr.get_computers_with_details()
 			for comp_id, details in mgr.computers.items():
 				if details.cloud_instance_id and (details.cloud_instance_id.lower().strip() == instance_id.lower().strip()):
-					detailed_msg = "Anti-Malware status: {}".format(details.module_status_anti_malware)
+					detailed_msg = "Current policy: {}".format(details.policy_name)
 					print(detailed_msg)
-					if "On, Real Time".lower() in details.module_status_anti_malware.lower():
-						is_protected = True
+					if details.policy_name.lower() == event['ruleParameters']['dsPolicy']:
+						has_policy = True
 
 			mgr.finish_session() # gracefully clean up our Deep Security session
 
@@ -86,7 +89,7 @@ def aws_config_rule_handler(event, context):
 	client = boto3.client('config')
 	if instance_id:
 		compliance = "NON_COMPLIANT"
-		if is_protected:
+		if has_policy:
 			compliance = 'COMPLIANT'
 
 		try:
