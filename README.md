@@ -2,6 +2,30 @@
 
 A set of AWS Config Rules to help ensure that your AWS deployments are leveraging the protection of Deep Security. These rules help centralize your compliance information in one place, AWS Config.
 
+## Permissions In Deep Security
+
+Deep Security has a strong role-based access control (RBAC) system built-in. In order for these AWS Lambda functions to query Deep Security, they require credentials to sign in.
+
+Here's the recommend configuration in order to implement this with the least amount of privileges possible within Deep Security.
+
+### User
+
+1. Create a new User with a unique, meaningful name (Administration > User Manager > Users > New...)
+1. Set a unique, complex password
+1. Fill in other details as desired
+
+### Role
+
+1. Create a new Role with a unique, meaningful name  (Administration > User Manager > Roles > New...)
+1. Under "Access Type", check "Allow Access to web services API"
+1. Under "Access Type", **uncheck** "Allow Access to Deep Security Manager User Interface"
+1. On the "Computer Rights" tab, select either "All Computers" or "Selected Computers:" ensuring that only the greyed out "View" right (under "Allow Users to:") is selected
+1. On the "Policy Rights" tab, select "Selected Policies" and ensure that no policies are selected (this makes sure the role grants no rights to user for any policies)
+1. On the "User Rights" tab, ensure that "Change own password and contact information only" is selected
+1. On the "Other Rights" tab, ensure that the default options remain with only "View-Only" and "Hide" assigned as permissions
+
+With the new User and new Role in place. Make sure you assign the Role to the user. This will ensure that your API access has the minimal permissions possible which reduces the risk if the credentials are exposed. 
+
 ## Rules
 
 ### ds-IsInstanceProtectedByAntiMalware
