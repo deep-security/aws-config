@@ -89,7 +89,7 @@ This rule requires view access to one or more computers within Deep Security.
 
 ### ds-DoesInstanceHavePolicy
 
-Checks to see if the current instance is protected by a specific of Deep Security's policy.
+Checks to see if the current instance is protected by a specific Deep Security policy.
 
 #### Rule Parameters:
 
@@ -132,7 +132,7 @@ This rule requires view access to one or more computers within Deep Security.
 
 ### ds-IsInstanceClear
 
-Checks to see if the current instance is has any warnings, alerts, or errors in Deep Security. An instance is compliant if it does **not** have any warnings, alerts, or errors (a/k/a compliant == everything is working as expected with no active security alerts).
+Checks to see if the current instance is has any warnings, alerts, or errors in Deep Security. An instance is compliant if it does **not** have any warnings, alerts, or errors (a/k/a compliant which means everything is working as expected with no active security alerts).
 
 #### Rule Parameters:
 
