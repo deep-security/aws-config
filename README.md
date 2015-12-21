@@ -191,3 +191,27 @@ Checks to see if the current instance is has any warnings, alerts, or errors in 
 During execution, this rule sign into the Deep Security API. You should setup a dedicated API access account to do this. Deep Security contains a robust role-based access control (RBAC) framework which you can use to ensure that this set of credentials has the least amount of privileges to success. 
 
 This rule requires view access to one or more computers within Deep Security.
+
+## Risk of Credentials in AWS Config
+
+If you're curious about the wisdom of storing access credentials in a 3rd party service...good. You've got your security hat on. Let's take a look at the risks.
+
+Right now, Deep Security uses it's role-based access control to provide access to it's APIs (yes, a more elegant system is on the way). This means we need to provide our AWS Lambda functions with some way of getting a set of credentials.
+
+Because Deep Security sits outside of the AWS IAM structure (a/k/a it's not an AWS service), we have the following options;
+
+1. hard code the credentials inside the AWS Lambda function
+1. pass the credentials to the function (current method)
+1. put the credentials somewhere else and provide access to that location to the function
+
+Option #1 removes the credentials from AWS Config and moves them to AWS Lambda. This allows for the segregation of duties via IAM access to these services. In turn it creates a significance maintenance challenge in the event you change credentials.
+
+Option #2 (current method) stores the credentials in AWS Config. Any [user or role with sufficient privileges](http://docs.aws.amazon.com/config/latest/developerguide/recommended-iam-permissions-using-aws-config-console-cli.html) can access AWS Config and the stored credentials. This is the same situation as option #1 but doesn't present the same maintenance issue.
+
+Option #3 would put the credentials in an alternative location (like S3 encrypted by KMS) reduces the possibility of the credentials leaking out significantly. Using IAM, you can ensure that only the Lambda execution role used for the function has access to the encryption key and the S3 key (object in the bucket). This solution has a lot more moving parts and is more difficult to configure.
+
+In a discussion of option #1 vs #2, option #2 is the better choice as the maintenance issues presented by hard coding credentials are significant. If segregation is required, option #3 is far superior as it directly addresses the security issues of broader access to the credentials.
+
+The risk posed by exposing the credentials to AWS COnfig can be partially mitigated by reducing the permissions that the credentials hold in Deep Security (see above, "Permissions In Deep Security"). However option #3 (storing the credentials in S3 and encrypting with KMS) is a much better option.
+
+We will release guidelines on how to implement this solution shortly for situations when option #2 (which will remain the default) is insufficient.
