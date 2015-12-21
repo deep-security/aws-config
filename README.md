@@ -29,12 +29,12 @@ Checks to see if the current instance is protected by Deep Security's anti-malwa
 <tr>
   <td>dsTenant</td>
   <td>string</td>
-  <td>**Optional as long as dsHostname is specified**. Indicates which tenant to sign into within Deep Security</td>
+  <td><i>Optional as long as dsHostname is specified</i>. Indicates which tenant to sign into within Deep Security</td>
 </tr>
 <tr>
   <td>dsHostname</td>
   <td>string</td>
-  <td>**Optional as long as dsTenant is specified**. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign into</td>
+  <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign into</td>
 </tr>
 </table>
 
@@ -70,12 +70,12 @@ This is the generic version of *ds-IsInstanceProtectedByAntiMalware*.
 <tr>
   <td>dsTenant</td>
   <td>string</td>
-  <td>**Optional as long as dsHostname is specified**. Indicates which tenant to sign into within Deep Security</td>
+  <td><i>Optional as long as dsHostname is specified</i>. Indicates which tenant to sign into within Deep Security</td>
 </tr>
 <tr>
   <td>dsHostname</td>
   <td>string</td>
-  <td>**Optional as long as dsTenatn is specified**. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign into</td>
+  <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign into</td>
 </tr>
 <tr>
   <td>dsControl</td>
