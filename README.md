@@ -4,7 +4,7 @@ A set of AWS Config Rules to help ensure that your AWS deployments are leveragin
 
 ## Permissions In Deep Security
 
-Deep Security has a strong role-based access control (RBAC) system built-in. In order for these AWS Lambda functions to query Deep Security, they require credentials to sign in.
+Deep Security has a strong role-based access control (RBAC) system built in. In order for these AWS Lambda functions to query Deep Security, they require credentials to sign in.
 
 Here's the recommend configuration in order to implement this with the least amount of privileges possible within Deep Security.
 
@@ -24,13 +24,13 @@ Here's the recommend configuration in order to implement this with the least amo
 1. On the "User Rights" tab, ensure that "Change own password and contact information only" is selected
 1. On the "Other Rights" tab, ensure that the default options remain with only "View-Only" and "Hide" assigned as permissions
 
-With the new User and new Role in place. Make sure you assign the Role to the user. This will ensure that your API access has the minimal permissions possible which reduces the risk if the credentials are exposed. 
+With the new User and new Role in place, make sure you assign the Role to the user. This will ensure that your API access has the minimal permissions possible, which reduces the risk if the credentials are exposed.
 
 ## Rules
 
 ### ds-IsInstanceProtectedByAntiMalware
 
-Checks to see if the current instance is protected by Deep Security's anti-malware controls. Anti-malware must be "on" and in "real-time" mode for rule to be considered compliant.
+Checks to see if the current instance is protected by Deep Security's anti-malware controls. Anti-malware must be "on" and in "real-time" mode for the rule to be considered compliant.
 
 #### Rule Parameters:
 
@@ -53,16 +53,16 @@ Checks to see if the current instance is protected by Deep Security's anti-malwa
 <tr>
   <td>dsTenant</td>
   <td>string</td>
-  <td><i>Optional as long as dsHostname is specified</i>. Indicates which tenant to sign into within Deep Security</td>
+  <td><i>Optional as long as dsHostname is specified</i>. Indicates which tenant to sign in to within Deep Security</td>
 </tr>
 <tr>
   <td>dsHostname</td>
   <td>string</td>
-  <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign into</td>
+  <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign in to</td>
 </tr>
 </table>
 
-During execution, this rule sign into the Deep Security API. You should setup a dedicated API access account to do this. Deep Security contains a robust role-based access control (RBAC) framework which you can use to ensure that this set of credentials has the least amount of privileges to success. 
+During execution, this rule sign in to the Deep Security API. You should setup a dedicated API access account to do this. Deep Security contains a robust role-based access control (RBAC) framework which you can use to ensure that this set of credentials has the least amount of privileges to success.
 
 This rule requires view access to one or more computers within Deep Security.
 
@@ -93,12 +93,12 @@ This is the generic version of *ds-IsInstanceProtectedByAntiMalware*.
 <tr>
   <td>dsTenant</td>
   <td>string</td>
-  <td><i>Optional as long as dsHostname is specified</i>. Indicates which tenant to sign into within Deep Security</td>
+  <td><i>Optional as long as dsHostname is specified</i>. Indicates which tenant to sign in to within Deep Security</td>
 </tr>
 <tr>
   <td>dsHostname</td>
   <td>string</td>
-  <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign into</td>
+  <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign in to</td>
 </tr>
 <tr>
   <td>dsControl</td>
@@ -107,7 +107,7 @@ This is the generic version of *ds-IsInstanceProtectedByAntiMalware*.
 </tr>
 </table>
 
-During execution, this rule sign into the Deep Security API. You should setup a dedicated API access account to do this. Deep Security contains a robust role-based access control (RBAC) framework which you can use to ensure that this set of credentials has the least amount of privileges to success. 
+During execution, this rule signs in to the Deep Security API. You should setup a dedicated API access account to do this. Deep Security contains a robust role-based access control (RBAC) framework which you can use to ensure that this set of credentials has the least amount of privileges to success.
 
 This rule requires view access to one or more computers within Deep Security.
 
@@ -136,12 +136,12 @@ Checks to see if the current instance is protected by a specific Deep Security p
 <tr>
   <td>dsTenant</td>
   <td>string</td>
-  <td><i>Optional as long as dsHostname is specified</i>. Indicates which tenant to sign into within Deep Security</td>
+  <td><i>Optional as long as dsHostname is specified</i>. Indicates which tenant to sign in to within Deep Security</td>
 </tr>
 <tr>
   <td>dsHostname</td>
   <td>string</td>
-  <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign into</td>
+  <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign in to</td>
 </tr>
 <tr>
   <td>dsPolicy</td>
@@ -150,13 +150,13 @@ Checks to see if the current instance is protected by a specific Deep Security p
 </tr>
 </table>
 
-During execution, this rule sign into the Deep Security API. You should setup a dedicated API access account to do this. Deep Security contains a robust role-based access control (RBAC) framework which you can use to ensure that this set of credentials has the least amount of privileges to success. 
+During execution, this rule signs in to the Deep Security API. You should setup a dedicated API access account to do this. Deep Security contains a robust role-based access control (RBAC) framework which you can use to ensure that this set of credentials has the least amount of privileges to success.
 
 This rule requires view access to one or more computers within Deep Security.
 
 ### ds-IsInstanceClear
 
-Checks to see if the current instance is has any warnings, alerts, or errors in Deep Security. An instance is compliant if it does **not** have any warnings, alerts, or errors (a/k/a compliant which means everything is working as expected with no active security alerts).
+Checks to see if the current instance is has any warnings, alerts, or errors in Deep Security. An instance is compliant if it does **not** have any warnings, alerts, or errors (a/k/a compliant, which means everything is working as expected with no active security alerts).
 
 #### Rule Parameters:
 
@@ -179,39 +179,39 @@ Checks to see if the current instance is has any warnings, alerts, or errors in 
 <tr>
   <td>dsTenant</td>
   <td>string</td>
-  <td><i>Optional as long as dsHostname is specified</i>. Indicates which tenant to sign into within Deep Security</td>
+  <td><i>Optional as long as dsHostname is specified</i>. Indicates which tenant to sign in to within Deep Security</td>
 </tr>
 <tr>
   <td>dsHostname</td>
   <td>string</td>
-  <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign into</td>
+  <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign in to</td>
 </tr>
 </table>
 
-During execution, this rule sign into the Deep Security API. You should setup a dedicated API access account to do this. Deep Security contains a robust role-based access control (RBAC) framework which you can use to ensure that this set of credentials has the least amount of privileges to success. 
+During execution, this rule signs in to the Deep Security API. You should setup a dedicated API access account to do this. Deep Security contains a robust role-based access control (RBAC) framework which you can use to ensure that this set of credentials has the least amount of privileges to success.
 
 This rule requires view access to one or more computers within Deep Security.
 
 ## Risk of Credentials in AWS Config
 
-If you're curious about the wisdom of storing access credentials in a 3rd party service...good. You've got your security hat on. Let's take a look at the risks.
+If you're curious about the wisdom of storing access credentials in a 3rd party service... good. You've got your security hat on. Let's take a look at the risks.
 
-Right now, Deep Security uses it's role-based access control to provide access to it's APIs (yes, a more elegant system is on the way). This means we need to provide our AWS Lambda functions with some way of getting a set of credentials.
+Right now, Deep Security uses its role-based access control to provide access to its APIs (yes, a more elegant system is on the way). This means we need to provide our AWS Lambda functions with some way of getting a set of credentials.
 
-Because Deep Security sits outside of the AWS IAM structure (a/k/a it's not an AWS service), we have the following options;
+Because Deep Security sits outside of the AWS IAM structure (a/k/a it's not an AWS service), we have the following options:
 
 1. hard code the credentials inside the AWS Lambda function
 1. pass the credentials to the function (current method)
 1. put the credentials somewhere else and provide access to that location to the function
 
-Option #1 removes the credentials from AWS Config and moves them to AWS Lambda. This allows for the segregation of duties via IAM access to these services. In turn it creates a significance maintenance challenge in the event you change credentials.
+Option #1 removes the credentials from AWS Config and moves them to AWS Lambda. This allows for the segregation of duties via IAM access to these services. In turn it creates a significant maintenance challenge in the event you change credentials.
 
 Option #2 (current method) stores the credentials in AWS Config. Any [user or role with sufficient privileges](http://docs.aws.amazon.com/config/latest/developerguide/recommended-iam-permissions-using-aws-config-console-cli.html) can access AWS Config and the stored credentials. This is the same situation as option #1 but doesn't present the same maintenance issue.
 
-Option #3 would put the credentials in an alternative location (like S3 encrypted by KMS) reduces the possibility of the credentials leaking out significantly. Using IAM, you can ensure that only the Lambda execution role used for the function has access to the encryption key and the S3 key (object in the bucket). This solution has a lot more moving parts and is more difficult to configure.
+Option #3 would put the credentials in an alternative location (like S3 encrypted by KMS) and significantly reduces the possibility of the credentials leaking out. Using IAM, you can ensure that only the Lambda execution role used for the function has access to the encryption key and the S3 key (object in the bucket). This solution has a lot more moving parts and is more difficult to configure.
 
 In a discussion of option #1 vs #2, option #2 is the better choice as the maintenance issues presented by hard coding credentials are significant. If segregation is required, option #3 is far superior as it directly addresses the security issues of broader access to the credentials.
 
-The risk posed by exposing the credentials to AWS COnfig can be partially mitigated by reducing the permissions that the credentials hold in Deep Security (see above, "Permissions In Deep Security"). However option #3 (storing the credentials in S3 and encrypting with KMS) is a much better option.
+The risk posed by exposing the credentials to AWS Config can be partially mitigated by reducing the permissions that the credentials hold in Deep Security (see above, "Permissions In Deep Security"). However, option #3 (storing the credentials in S3 and encrypting with KMS) is a much better option.
 
 We will release guidelines on how to implement this solution shortly for situations when option #2 (which will remain the default) is insufficient.
