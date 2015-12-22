@@ -6,12 +6,79 @@ from __future__ import print_function
 # Standard library
 import datetime
 import json
+import urlparse
 
 # Project libraries
 import deepsecurity
 
 # 3rd party libraries
 import boto3
+from Crypto.Cipher import AES
+
+class Decrypter():
+	"""
+	Utility class to decrypt data using an encrypted data key protected using a KMS master key.
+	"""
+
+	def __init__(self, profile_name=None, key=None, context={}, data=""):
+		self.key = key
+		self.data = data
+		self.context = context
+
+		self.session = boto3.session.Session(
+			profile_name = profile_name
+		)
+
+	def _read(self, data):
+		split = urlparse.urlsplit(data)
+
+		if split.scheme == 's3':
+			s3 = self.session.resource('s3')
+			object = s3.Object(split.netloc, split.path[1:])
+			return object.get()['Body'].read()
+		elif split.scheme == 'data':
+			if ',' in split.path:
+				head, payload = split.path.split(',', 1)
+
+				# TODO really we should pay more attention to the header portion
+				if 'base64' in head.split(';'):
+					return payload.decode('base64')
+				else:
+					return payload
+			else:
+				return split.path
+# We explicitly do not want file: URI support in our lambda
+#		elif split.scheme == 'file':
+#			with open(split.path, 'r') as file:
+#				return file.read()
+		else:
+			return data
+
+	def decrypt(self):
+		if self.context:
+			if not type(self.context) == type({}):
+				self.context = json.loads(self._read(self.context))
+		else:
+			self.context = {}
+
+		key_ciphertext = self._read(self.key)
+		client = self.session.client('kms')
+
+		response = client.decrypt(
+			CiphertextBlob = key_ciphertext,
+			EncryptionContext = self.context
+		)
+
+		# http://stackoverflow.com/a/12525165
+		unpad = lambda s : s[:-ord(s[len(s)-1:])]
+
+		data = self._read(self.data)
+
+		iv = data[:AES.block_size]
+		cipher = AES.new(response['Plaintext'], AES.MODE_CBC, iv)
+		plaintext = unpad(cipher.decrypt(data[AES.block_size:]))
+
+		return plaintext
 
 def aws_config_rule_handler(event, context):
 	"""
@@ -49,8 +116,23 @@ def aws_config_rule_handler(event, context):
 			print("Credentials for Deep Security passed to function successfully")
 
 		if not event['ruleParameters'].has_key('dsControl') or \
-			event['ruleParameters']['dsControl'].lower() in [ 'anti_malware', 'web_reputation', 'firewall', 'intrusion_prevention', 'integrity_monitoring', 'log_inspection' ]:
-			return { 'requirements_not_met': 'Function requires that you specify the desired Deep Security control to verify. Valid choices are [ anti_malware, web_reputation, firewall, intrusion_prevention, integrity_monitoring, log_inspection ]' } 
+			not event['ruleParameters']['dsControl'].lower() in [ 'anti_malware', 'web_reputation', 'firewall', 'intrusion_prevention', 'integrity_monitoring', 'log_inspection' ]:
+			return { 'requirements_not_met': 'Function requires that you specify the desired Deep Security control to verify. Valid choices are [ anti_malware, web_reputation, firewall, intrusion_prevention, integrity_monitoring, log_inspection ]' }
+
+	# We know that event['ruleParameters']['dsPassword'] exists because of the checks immediately above.
+	# Now we need to see if that password needs to be decrypted
+	if event['ruleParameters'].has_key('dsPasswordEncryptionKey'):
+		print("has password encryption key")
+		encryptionContext = event['ruleParameters']['dsPasswordEncryptionContext'] if event['ruleParameters'].has_key('dsPasswordEncryptionContext') else {}
+		ds_password = Decrypter(
+			key = event['ruleParameters']['dsPasswordEncryptionKey'],
+			context = encryptionContext,
+			data = event['ruleParameters']['dsPassword']
+		).decrypt()
+		print("decrypted password")
+	else:
+		print("does not have password encryption key")
+		ds_password = event['ruleParameters']['dsPassword']
 
 	# Determine if this is an EC2 instance event
 	if event.has_key('invokingEvent'):
@@ -69,7 +151,7 @@ def aws_config_rule_handler(event, context):
 		ds_hostname = event['ruleParameters']['dsHostname'] if event['ruleParameters'].has_key('dsHostname') else None
 		mgr = None
 		try:
-			mgr = deepsecurity.manager.Manager(username=event['ruleParameters']['dsUsername'], password=event['ruleParameters']['dsPassword'], tenant=ds_tenant, dsm_hostname=ds_hostname)
+			mgr = deepsecurity.manager.Manager(username=event['ruleParameters']['dsUsername'], password=ds_password, tenant=ds_tenant, dsm_hostname=ds_hostname)
 			print("Successfully authenticated to Deep Security")
 		except Exception, err:
 			print("Could not authenticate to Deep Security. Threw exception: {}".format(err))

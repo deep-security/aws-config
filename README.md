@@ -87,8 +87,18 @@ This is the generic version of *ds-IsInstanceProtectedByAntiMalware*.
 </tr>
 <tr>
   <td>dsPassword</td>
-  <td>string</td>
+  <td>string or URI</td>
   <td>The password for the Deep Security account to use for querying anti-malware status. This password is readable by any identity that can access the AWS Lambda function. Use only the bare minimum permissions within Deep Security (see note below)</td>
+</tr>
+<tr>
+  <td>dsPasswordEncryptionKey</td>
+  <td>string or URI</td>
+  <td>The encrypted data encryption key used to encrypt the <code>dsPassword</code>. If this is specified, the rule will first decrypt the <code>dsPasswordEncryptionKey</code> and then decrypt the <code>dsPassword</code> using the value. See [Protecting Your Deep Security Manager API Password](#protecting-your-deep-security-manager-api-password) below for more details.
+</tr>
+<tr>
+  <td>dsPasswordEncryptionContext</td>
+  <td>string or URI</td>
+  <td>The encryption context used to encrypt the <code>dsPassword</code>. If this parameter is given, the rule will include the encryption context information when decrypting the <code>dsPassword</code> value. Requires <code>dsPasswordEncryptionKey</code> to be useful. See [Protecting Your Deep Security Manager API Password](#protecting-your-deep-security-manager-api-password) below for more details.
 </tr>
 <tr>
   <td>dsTenant</td>
@@ -214,4 +224,57 @@ In a discussion of option #1 vs #2, option #2 is the better choice as the mainte
 
 The risk posed by exposing the credentials to AWS Config can be partially mitigated by reducing the permissions that the credentials hold in Deep Security (see above, "Permissions In Deep Security"). However, option #3 (storing the credentials in S3 and encrypting with KMS) is a much better option.
 
-We will release guidelines on how to implement this solution shortly for situations when option #2 (which will remain the default) is insufficient.
+See [Protecting Your Deep Security Manager API Password](#protecting-your-deep-security-manager-api-password) below for instructions on how to implement option #3.
+
+## Protecting Your Deep Security Manager API Password
+
+If you're feeling nervous about having a plaintext password in your rule configuration, this section will help you.
+
+You may have noticed that the rules give you the option to specify your password as a string **or URI**, and that there are optional parameters for specifying an encryption key and an encryption context, each of which can also be provided as string or URI.
+
+We won't try to cover all of the concepts involved here, but we will give you just enough to be dangerous. If you want to learn more, the [AWS Key Management Service documentation](https://aws.amazon.com/documentation/kms/) is the best place to start.
+
+In the AWS Key Management Service (AWS KMS), you create a [Customer Master Key](http://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#master_keys). This master key remains securely stored by AWS KMS, and can be used to generate [data keys](http://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#data-keys) that are then used to encrypt individual data items, in this case your password. The encrypted data key is normally stored alongside the encrypted data. You can also optionally provide an [encryption context](http://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#encrypt_context) to allow more fine-grained access to the encrypted data.
+
+If you provide encryption context, you should provide the key-value pairs as a JSON object, like this:
+```
+{ "key1": "value1", "key2": "value2" }
+```
+
+If you provide an password encryption key, the rule will first call AWS KMS to decrypt the password encryption key, and will then decrypt the password. If you have provided an encryption context, that information will be provided when decrypting your password encryption key.
+
+AWS S3 is a great place to keep your encrypted password and encrypted password key. To do this, simply provide the S3 URI to the objects when you're specifying the rule parameter values. For example:
+<table>
+<tr>
+<td><code>dsPassword</code></td>
+<td><code>s3://bucket/path/to/password.enc</code></td>
+</tr>
+<tr>
+<td><code>dsPasswordEncryptionKey</code></td>
+<td><code>s3://bucket/path/to/password.key</code></td>
+</tr>
+<tr>
+<td><code>dsPasswordEncryptionContext</code></td>
+<td><code>s3://bucket/path/to/password.ctx</code></td>
+</tr>
+</table>
+
+If you want to keep the encryption context separate, you can put the value directly into the rule parameters as a JSON string:
+<table>
+<tr>
+<td><code>dsPassword</code></td>
+<td><code>s3://bucket/path/to/password.enc</code></td>
+</tr>
+<tr>
+<td><code>dsPasswordEncryptionKey</code></td>
+<td><code>s3://bucket/path/to/password.key</code></td>
+</tr>
+<tr>
+<td><code>dsPasswordEncryptionContext</code></td>
+<td><code>{ "key1": "value1", "key2": "value2" }</code></td>
+</tr>
+</table>
+
+There are some tools in the `tools` directory that will help you create and verify an encrypted password and an encrypted password key.
+
+**IMPORTANT**: Make sure that the IAM role assigned to your rule has permissions to read the S3 bucket and objects, and also to access the KMS `Decrypt` API and the key.
