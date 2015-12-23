@@ -52,6 +52,16 @@ Checks to see if the current instance is protected by Deep Security's anti-malwa
   <td>The password for the Deep Security account to use for querying anti-malware status. This password is readable by any identity that can access the AWS Lambda function. Use only the bare minimum permissions within Deep Security (see note below)</td>
 </tr>
 <tr>
+  <td>dsPasswordKey</td>
+  <td>string or URI</td>
+  <td>The encrypted data encryption key used to encrypt the <code>dsPassword</code>. If this is specified, the rule will first decrypt the <code>dsPasswordKey</code> and then decrypt the <code>dsPassword</code> using the value. See [Protecting Your Deep Security Manager API Password](#protecting-your-deep-security-manager-api-password) below for more details.
+</tr>
+<tr>
+  <td>dsPasswordEncryptionContext</td>
+  <td>string or URI</td>
+  <td>The encryption context used to encrypt the <code>dsPassword</code>. If this parameter is given, the rule will include the encryption context information when decrypting the <code>dsPassword</code> value. Requires <code>dsPasswordKey</code> to be useful. See [Protecting Your Deep Security Manager API Password](#protecting-your-deep-security-manager-api-password) below for more details.
+</tr>
+<tr>
   <td>dsTenant</td>
   <td>string</td>
   <td><i>Optional as long as dsHostname is specified</i>. Indicates which tenant to sign in to within Deep Security</td>
@@ -145,6 +155,16 @@ Checks to see if the current instance is protected by a specific Deep Security p
   <td>The password for the Deep Security account to use for querying anti-malware status. This password is readable by any identity that can access the AWS Lambda function. Use only the bare minimum permissions within Deep Security (see note below)</td>
 </tr>
 <tr>
+  <td>dsPasswordKey</td>
+  <td>string or URI</td>
+  <td>The encrypted data encryption key used to encrypt the <code>dsPassword</code>. If this is specified, the rule will first decrypt the <code>dsPasswordKey</code> and then decrypt the <code>dsPassword</code> using the value. See [Protecting Your Deep Security Manager API Password](#protecting-your-deep-security-manager-api-password) below for more details.
+</tr>
+<tr>
+  <td>dsPasswordEncryptionContext</td>
+  <td>string or URI</td>
+  <td>The encryption context used to encrypt the <code>dsPassword</code>. If this parameter is given, the rule will include the encryption context information when decrypting the <code>dsPassword</code> value. Requires <code>dsPasswordKey</code> to be useful. See [Protecting Your Deep Security Manager API Password](#protecting-your-deep-security-manager-api-password) below for more details.
+</tr>
+<tr>
   <td>dsTenant</td>
   <td>string</td>
   <td><i>Optional as long as dsHostname is specified</i>. Indicates which tenant to sign in to within Deep Security</td>
@@ -186,6 +206,16 @@ Checks to see if the current instance is has any warnings, alerts, or errors in 
   <td>dsPassword</td>
   <td>string</td>
   <td>The password for the Deep Security account to use for querying anti-malware status. This password is readable by any identity that can access the AWS Lambda function. Use only the bare minimum permissions within Deep Security (see note below)</td>
+</tr>
+<tr>
+  <td>dsPasswordKey</td>
+  <td>string or URI</td>
+  <td>The encrypted data encryption key used to encrypt the <code>dsPassword</code>. If this is specified, the rule will first decrypt the <code>dsPasswordKey</code> and then decrypt the <code>dsPassword</code> using the value. See [Protecting Your Deep Security Manager API Password](#protecting-your-deep-security-manager-api-password) below for more details.
+</tr>
+<tr>
+  <td>dsPasswordEncryptionContext</td>
+  <td>string or URI</td>
+  <td>The encryption context used to encrypt the <code>dsPassword</code>. If this parameter is given, the rule will include the encryption context information when decrypting the <code>dsPassword</code> value. Requires <code>dsPasswordKey</code> to be useful. See [Protecting Your Deep Security Manager API Password](#protecting-your-deep-security-manager-api-password) below for more details.
 </tr>
 <tr>
   <td>dsTenant</td>
