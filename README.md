@@ -257,6 +257,8 @@ The risk posed by exposing the credentials to AWS Config can be partially mitiga
 
 See [Protecting Your Deep Security Manager API Password](#protecting-your-deep-security-manager-api-password) below for instructions on how to implement option #3.
 
+<a name="protecting-your-deep-security-manager-api-password" />
+
 ## Protecting Your Deep Security Manager API Password
 
 If you're feeling nervous about having a plaintext password in your rule configuration, this section will help you get set up with an encrypted password.

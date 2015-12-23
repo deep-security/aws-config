@@ -120,6 +120,10 @@ def aws_config_rule_handler(event, context):
 		else:
 			print("Credentials for Deep Security passed to function successfully")
 
+	# Is the function is setup to use encryption but can't import pycrypto, fail gracefully
+	if not encryption_capable and event['ruleParameters'].has_key('dsPasswordKey'):
+		return  { 'requirements_not_met': "Function is requesting encrypted credntials but can't import pycrypto. Please see https://github.com/deep-security/aws-config/blob/master/README.md#protecting-your-deep-security-manager-api-password for more details" } 
+
 	if encryption_capable:
 		# We know that event['ruleParameters']['dsPassword'] exists because of the checks immediately above.
 		# Now we need to see if that password needs to be decrypted
