@@ -27,7 +27,7 @@ python encrypt.py \
   --keyid arn:aws:kms:us-east-1:123456789012:key/... \
   --context file:data.ctx \
   --data file:data.txt \
-  --keyout keyout.key \
+  --keyout data.key \
   --out data.enc
 ```
 
@@ -38,7 +38,7 @@ python encrypt.py \
   --keyid arn:aws:kms:us-east-1:123456789012:key/... \
   --context file:data.ctx \
   --data data:text/plain,opensesame \
-  --keyout keyout.key \
+  --keyout data.key \
   --out data.enc
 ```
 
@@ -66,7 +66,7 @@ Example:
 ````
 python decrypt.py \
   --profile profile-name \
-  --key file:keyout.key \
+  --key file:data.key \
   --context file:data.ctx \
   --data file:data.enc
 ```
