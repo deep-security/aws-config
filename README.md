@@ -33,6 +33,8 @@ Make sure you assign the Role to the user. This will ensure that your API access
 
 Checks to see if the current instance is protected by Deep Security's anti-malware controls. Anti-malware must be "on" and in "real-time" mode for the rule to be considered compliant.
 
+Lambda handler: **dsIsInstanceProtectedByAntiMalware.aws_config_rule_handler**
+
 #### Rule Parameters:
 
 <table>
@@ -82,6 +84,8 @@ This rule requires view access to one or more computers within Deep Security.
 Checks to see if the current instance is protected by any of Deep Security's controls. Controls must be "on" and set to their strongest setting (a/k/a "real-time" or "prevention") in order for the rule to be considered compliant.
 
 This is the generic version of *ds-IsInstanceProtectedByAntiMalware*.
+
+Lambda handler: **dsIsInstanceProtectedBy.aws_config_rule_handler**
 
 #### Rule Parameters:
 
@@ -136,6 +140,8 @@ This rule requires view access to one or more computers within Deep Security.
 
 Checks to see if the current instance is protected by a specific Deep Security policy.
 
+Lambda handler: **dsDoesInstanceHavePolicy.aws_config_rule_handler**
+
 #### Rule Parameters:
 
 <table>
@@ -188,6 +194,8 @@ This rule requires view access to one or more computers within Deep Security.
 ### ds-IsInstanceClear
 
 Checks to see if the current instance is has any warnings, alerts, or errors in Deep Security. An instance is compliant if it does **not** have any warnings, alerts, or errors (a/k/a compliant, which means everything is working as expected with no active security alerts).
+
+Lambda handler: **dsIsInstanceClear.aws_config_rule_handler**
 
 #### Rule Parameters:
 
