@@ -13,7 +13,12 @@ import deepsecurity
 
 # 3rd party libraries
 import boto3
-from Crypto.Cipher import AES
+encryption_capable = False
+try:
+	from Crypto.Cipher import AES # external dependency
+	encryption_capable = True
+except Exception, err: pass # we use the flag to ignore
+
 
 class Decrypter():
 	"""
@@ -115,20 +120,23 @@ def aws_config_rule_handler(event, context):
 		else:
 			print("Credentials for Deep Security passed to function successfully")
 
-	# We know that event['ruleParameters']['dsPassword'] exists because of the checks immediately above.
-	# Now we need to see if that password needs to be decrypted
-	if event['ruleParameters'].has_key('dsPasswordKey'):
-		print("has password encryption key")
-		encryptionContext = event['ruleParameters']['dsPasswordEncryptionContext'] if event['ruleParameters'].has_key('dsPasswordEncryptionContext') else {}
-		ds_password = Decrypter(
-			key = event['ruleParameters']['dsPasswordKey'],
-			context = encryptionContext,
-			data = event['ruleParameters']['dsPassword']
-		).decrypt()
-		print("decrypted password")
+	if encryption_capable:
+		# We know that event['ruleParameters']['dsPassword'] exists because of the checks immediately above.
+		# Now we need to see if that password needs to be decrypted
+		if event['ruleParameters'].has_key('dsPasswordKey'):
+			print("Function has password encryption key")
+			encryptionContext = event['ruleParameters']['dsPasswordEncryptionContext'] if event['ruleParameters'].has_key('dsPasswordEncryptionContext') else {}
+			ds_password = Decrypter(
+				key = event['ruleParameters']['dsPasswordKey'],
+				context = encryptionContext,
+				data = event['ruleParameters']['dsPassword']
+			).decrypt()
+			print("Function successfully decrypted password")
+		else:
+			print("Function does not have password encryption key")
+			ds_password = event['ruleParameters']['dsPassword']
 	else:
-		print("does not have password encryption key")
-		ds_password = event['ruleParameters']['dsPassword']
+		ds_password = event['ruleParameters']['dsPassword']			
 
 	if not event['ruleParameters'].has_key('dsPolicy'):
 		return { 'requirements_not_met': 'Function requires that you specify the desired Deep Security policy to verify.' }
