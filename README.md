@@ -36,7 +36,7 @@ For each of these rules, the AWS Lambda configuration is the same. Please make s
 - Handler: filename_for_the_rule.aws_config_rule_handler
 - Role: a role with at least the rights as shown in [dsConfigRulePolicy.json](/dsConfigRulePolicy.json). **Remember** to change line 18 to reflect your S3 bucket information (BUCKET/PATH/TO/OBJECTS/*)
 - (Advanced Settings) Memory: 128 MB
-- Timeout: 3m 0s
+- (Advanced Settings) Timeout: 3m 0s
 
 ## Rules
 
