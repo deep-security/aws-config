@@ -2,6 +2,8 @@
 
 A set of AWS Config Rules to help ensure that your AWS deployments are leveraging the protection of Deep Security. These rules help centralize your compliance information in one place, AWS Config.
 
+<a href="permissions-in-deep-security"/>
+
 ## Permissions In Deep Security
 
 Deep Security has a strong role-based access control (RBAC) system built in. In order for these AWS Lambda functions to query Deep Security, they require credentials to sign in.
@@ -26,6 +28,15 @@ Here's the recommend configuration in order to implement this with the least amo
 1. Set the Role to the role you created in the previous section.
 
 Make sure you assign the Role to the user. This will ensure that your API access has the minimal permissions possible, which reduces the risk if the credentials are exposed.
+
+## AWS Lambda Configuration
+
+For each of these rules, the AWS Lambda configuration is the same. Please make sure to configure the following;
+
+- Handler: filename_for_the_rule.aws_config_rule_handler
+- Role: a role with at least the rights as shown in [dsConfigRulePolicy.json](/dsConfigRulePolicy.json). **Remember** to change line 18 to reflect your S3 bucket information (BUCKET/PATH/TO/OBJECTS/*)
+- (Advanced Settings) Memory: 128 MB
+- Timeout: 3m 0s
 
 ## Rules
 
