@@ -49,7 +49,7 @@ def aws_config_rule_handler(event, context):
 			print("Credentials for Deep Security passed to function successfully")
 
 		if not event['ruleParameters'].has_key('dsControl') or \
-			event['ruleParameters']['dsControl'].lower() in [ 'anti_malware', 'web_reputation', 'firewall', 'intrusion_prevention', 'integrity_monitoring', 'log_inspection' ]:
+			not event['ruleParameters']['dsControl'].lower() in [ 'anti_malware', 'web_reputation', 'firewall', 'intrusion_prevention', 'integrity_monitoring', 'log_inspection' ]:
 			return { 'requirements_not_met': 'Function requires that you specify the desired Deep Security control to verify. Valid choices are [ anti_malware, web_reputation, firewall, intrusion_prevention, integrity_monitoring, log_inspection ]' } 
 
 	# Determine if this is an EC2 instance event
