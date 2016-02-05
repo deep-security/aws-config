@@ -37,12 +37,12 @@ class Computer(object):
 			try:
 				setattr(self, prop, host_details[key])
 			except Exception, err:
-				if self.manager: self.manager.log.warning("Could not add property [%s] to computer [%s]. Threw exception: %s" % (prop, host_details['name'], err))
+				if self.manager: self.manager.log("Could not add property [%s] to computer [%s]. Threw exception: %s" % (prop, host_details['name'], err), level='warning')
 
 		try:
 			self.number_of_interfaces = len(host_details['hostInterfaces'])
 		except Exception, err:
-			if self.manager: self.manager.log.warning("Could not add property [number_of_interfaces] to computer [%s]. Threw exception: %s" % (host_details['name'], err))
+			if self.manager: self.manager.log("Could not add property [number_of_interfaces] to computer [%s]. Threw exception: %s" % (host_details['name'], err), level='warning')
 
 	# *****************************************************************
 	# Public methods
