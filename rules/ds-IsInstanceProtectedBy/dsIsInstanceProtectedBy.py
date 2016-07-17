@@ -110,6 +110,13 @@ def aws_config_rule_handler(event, context):
 	if event.has_key('ruleParameters') and not type(event['ruleParameters']) == type({}): event['ruleParameters'] = json.loads(event['ruleParameters'])
 	if event.has_key('invokingEvent') and not type(event['invokingEvent']) == type({}): event['invokingEvent'] = json.loads(event['invokingEvent'])
 
+	# Make sure the resource is still in scope
+	if event.has_key('invokingEvent'):
+		if event['invokingEvent'].has_key('configurationItem'):
+			if event['invokingEvent']['configurationItem'].has_key('eventLeftScope') and not event['invokingEvent']['configurationItem']['eventLeftScope'] in ['OK', 'ResourceDiscovered']:
+				# event has left scope (a/k/a deleted), don't evaluate
+				return { 'result': 'resource out of scope' }
+
 	# Make sure we have the required rule parameters
 	if event.has_key('ruleParameters'):
 		if not event['ruleParameters'].has_key('dsUsername') and \
