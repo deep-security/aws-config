@@ -92,6 +92,16 @@ Lambda handler: **dsIsInstanceProtectedByAntiMalware.aws_config_rule_handler**
   <td>string</td>
   <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign in to</td>
 </tr>
+<tr>
+  <td>dsPort</td>
+  <td>int</td>
+  <td><i>Optional</i>. Defaults to 443. Indicates the port to connect to the Deep Security manager on</td>
+</tr>
+<tr>
+  <td>dsIgnoreSslValidation</td>
+  <td>int (0 or 1)</td>
+  <td><i>Optional</i>. 0 for false, 1 for true. Use only when connecting to a Deep Security manager that is using a self-signed SSL certificate</td>
+</tr>
 </table>
 
 During execution, this rule sign in to the Deep Security API. You should setup a dedicated API access account to do this. Deep Security contains a robust role-based access control (RBAC) framework which you can use to ensure that this set of credentials has the least amount of privileges to success.
@@ -143,6 +153,16 @@ Lambda handler: **dsIsInstanceProtectedBy.aws_config_rule_handler**
   <td>dsHostname</td>
   <td>string</td>
   <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign in to</td>
+</tr>
+<tr>
+  <td>dsPort</td>
+  <td>int</td>
+  <td><i>Optional</i>. Defaults to 443. Indicates the port to connect to the Deep Security manager on</td>
+</tr>
+<tr>
+  <td>dsIgnoreSslValidation</td>
+  <td>int (0 or 1)</td>
+  <td><i>Optional</i>. 0 for false, 1 for true. Use only when connecting to a Deep Security manager that is using a self-signed SSL certificate</td>
 </tr>
 <tr>
   <td>dsControl</td>
@@ -200,6 +220,16 @@ Lambda handler: **dsDoesInstanceHavePolicy.aws_config_rule_handler**
   <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign in to</td>
 </tr>
 <tr>
+  <td>dsPort</td>
+  <td>int</td>
+  <td><i>Optional</i>. Defaults to 443. Indicates the port to connect to the Deep Security manager on</td>
+</tr>
+<tr>
+  <td>dsIgnoreSslValidation</td>
+  <td>int (0 or 1)</td>
+  <td><i>Optional</i>. 0 for false, 1 for true. Use only when connecting to a Deep Security manager that is using a self-signed SSL certificate</td>
+</tr>
+<tr>
   <td>dsPolicy</td>
   <td>string</td>
   <td>The name of the policy to verify</td>
@@ -253,6 +283,16 @@ Lambda handler: **dsIsInstanceClear.aws_config_rule_handler**
   <td>dsHostname</td>
   <td>string</td>
   <td><i>Optional as long as dsTenant is specified</i>. Defaults to Deep Security as a Service. Indicates which Deep Security manager the rule should sign in to</td>
+</tr>
+<tr>
+  <td>dsPort</td>
+  <td>int</td>
+  <td><i>Optional</i>. Defaults to 443. Indicates the port to connect to the Deep Security manager on</td>
+</tr>
+<tr>
+  <td>dsIgnoreSslValidation</td>
+  <td>int (0 or 1)</td>
+  <td><i>Optional</i>. 0 for false, 1 for true. Use only when connecting to a Deep Security manager that is using a self-signed SSL certificate</td>
 </tr>
 </table>
 

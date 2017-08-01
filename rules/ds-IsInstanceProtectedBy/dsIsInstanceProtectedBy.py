@@ -160,9 +160,11 @@ def aws_config_rule_handler(event, context):
 		# We know this instance ID was somehow impacted, check it's status in Deep Security
 		ds_tenant = event['ruleParameters']['dsTenant'] if event['ruleParameters'].has_key('dsTenant') else None
 		ds_hostname = event['ruleParameters']['dsHostname'] if event['ruleParameters'].has_key('dsHostname') else None
+		ds_port = event['ruleParameters']['dsPort'] if event['ruleParameters'].has_key('dsPort') else 443
+		ds_ignore_ssl_validation = bool(event['ruleParameters']['dsIgnoreSslValidation']) if event['ruleParameters'].has_key('dsIgnoreSslValidation') else False
 		mgr = None
 		try:
-			mgr = deepsecurity.dsm.Manager(username=event['ruleParameters']['dsUsername'], password=ds_password, tenant=ds_tenant, hostname=ds_hostname)
+			mgr = deepsecurity.dsm.Manager(username=event['ruleParameters']['dsUsername'], password=ds_password, tenant=ds_tenant, hostname=ds_hostname, port=ds_port, ignore_ssl_validation=ds_ignore_ssl_validation)
 			mgr.sign_in()
 		except Exception, err:
 			print("Could not authenticate to Deep Security. Threw exception: {}".format(err))
