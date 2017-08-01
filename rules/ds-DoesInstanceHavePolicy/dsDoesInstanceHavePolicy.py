@@ -162,7 +162,7 @@ def aws_config_rule_handler(event, context):
 		ds_hostname = event['ruleParameters']['dsHostname'] if event['ruleParameters'].has_key('dsHostname') else None
 		mgr = None
 		try:
-			mgr = deepsecurity.manager.Manager(username=event['ruleParameters']['dsUsername'], password=ds_password, tenant=ds_tenant, hostname=ds_hostname)
+			mgr = deepsecurity.dsm.Manager(username=event['ruleParameters']['dsUsername'], password=ds_password, tenant=ds_tenant, hostname=ds_hostname)
 			mgr.sign_in()
 			print("Successfully authenticated to Deep Security")
 		except Exception, err:
