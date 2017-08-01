@@ -72,6 +72,9 @@ class Manager(core.CoreApi):
   
   @hostname.setter
   def hostname(self, value):
+    if not value:
+      self.log(message="Null/invalid hostname provided for DSM. This is required for API usage. Defaulting to Deep Security as a Service", level='critical')
+      value = 'app.deepsecurity.trendmicro.com'
     if value == 'app.deepsecurity.trendmicro.com': # Deep Security as a Service
       self.port = 443
     self._hostname = value

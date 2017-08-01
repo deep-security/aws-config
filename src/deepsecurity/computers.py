@@ -119,7 +119,11 @@ class Computers(core.CoreDict):
     if response and response['status'] == 200:
       if not type(response['data']) == type([]): response['data'] = [response['data']]
       for computer in response['data']:
-        computer_obj = Computer(self.manager, computer, self.log)
+        computer_obj = None
+        try:
+          computer_obj = Computer(self.manager, computer, self.log)
+        except Exception, err:
+          self.log("Could not create Computer from API response")
         if computer_obj:
           self[computer_obj.id] = computer_obj
           self.log("Added Computer {}".format(computer_obj.id), level='debug')
@@ -194,6 +198,8 @@ class Computer(core.CoreObject):
     self.manager = manager
     self.recommended_rules = None
     if api_response: self._set_properties(api_response, log_func)
+
+    if not ('id') in dir(self): raise Exception("Could not create Computer from response") 
 
   def send_events(self):
     """

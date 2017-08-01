@@ -162,13 +162,14 @@ def aws_config_rule_handler(event, context):
 		ds_hostname = event['ruleParameters']['dsHostname'] if event['ruleParameters'].has_key('dsHostname') else None
 		mgr = None
 		try:
-			mgr = deepsecurity.manager.Manager(username=event['ruleParameters']['dsUsername'], password=ds_password, tenant=ds_tenant, dsm_hostname=ds_hostname)
+			mgr = deepsecurity.manager.Manager(username=event['ruleParameters']['dsUsername'], password=ds_password, tenant=ds_tenant, hostname=ds_hostname)
+			mgr.sign_in()
 			print("Successfully authenticated to Deep Security")
 		except Exception, err:
 			print("Could not authenticate to Deep Security. Threw exception: {}".format(err))
 
 		if mgr:
-			mgr.get_computers_with_details()
+			mgr.computers.get()
 			for comp_id, details in mgr.computers.items():
 				if details.cloud_instance_id and (details.cloud_instance_id.lower().strip() == instance_id.lower().strip()):
 					detailed_msg = "Current policy: {}".format(details.policy_name)
@@ -176,7 +177,7 @@ def aws_config_rule_handler(event, context):
 					if details.policy_name.lower() == event['ruleParameters']['dsPolicy']:
 						has_policy = True
 
-			mgr.finish_session() # gracefully clean up our Deep Security session
+			mgr.sign_out() # gracefully clean up our Deep Security session
 
 	# Report the results back to AWS Config
 	if detailed_msg:
