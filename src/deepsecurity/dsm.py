@@ -36,11 +36,11 @@ class Manager(core.CoreApi):
 
     # allow for explicit override
     if tenant:
-      self._tenant = unicode(tenant, "utf-8")
+      self._tenant = unicode(tenant, "utf-8") if not type(tenant) == type(unicode("")) else tenant
     if username:
-      self._username = unicode(username, "utf-8")
+      self._username = unicode(username, "utf-8") if not type(username) == type(unicode("")) else username
     if password:
-      self._password = unicode(password, "utf-8")
+      self._password = unicode(password, "utf-8") if not type(password) == type(unicode("")) else password
 
     self.computer_groups = computers.ComputerGroups(manager=self)
     self.computers = computers.Computers(manager=self)

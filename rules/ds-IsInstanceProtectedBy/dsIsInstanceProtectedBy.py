@@ -158,13 +158,13 @@ def aws_config_rule_handler(event, context):
 
 	if instance_id:
 		# We know this instance ID was somehow impacted, check it's status in Deep Security
-		ds_tenant = unicode(event['ruleParameters']['dsTenant'], "utf-8") if event['ruleParameters'].has_key('dsTenant') else None
-		ds_hostname = unicode(event['ruleParameters']['dsHostname'], "utf-8") if event['ruleParameters'].has_key('dsHostname') else None
-		ds_port = unicode(event['ruleParameters']['dsPort'], "utf-8") if event['ruleParameters'].has_key('dsPort') else 443
-		ds_ignore_ssl_validation = bool(unicode(event['ruleParameters']['dsIgnoreSslValidation'], "utf-8")) if event['ruleParameters'].has_key('dsIgnoreSslValidation') else False
+		ds_tenant = event['ruleParameters']['dsTenant'] if event['ruleParameters'].has_key('dsTenant') else None
+		ds_hostname = event['ruleParameters']['dsHostname'] if event['ruleParameters'].has_key('dsHostname') else None
+		ds_port = event['ruleParameters']['dsPort'] if event['ruleParameters'].has_key('dsPort') else 443
+		ds_ignore_ssl_validation = bool(event['ruleParameters']['dsIgnoreSslValidation']) if event['ruleParameters'].has_key('dsIgnoreSslValidation') else False
 		mgr = None
 		try:
-			mgr = deepsecurity.dsm.Manager(username=unicode(event['ruleParameters']['dsUsername'], "utf-8"), password=ds_password, tenant=ds_tenant, hostname=ds_hostname, port=ds_port, ignore_ssl_validation=ds_ignore_ssl_validation)
+			mgr = deepsecurity.dsm.Manager(username=event['ruleParameters']['dsUsername'], password=ds_password, tenant=ds_tenant, hostname=ds_hostname, port=ds_port, ignore_ssl_validation=ds_ignore_ssl_validation)
 			mgr.sign_in()
 			print("Successfully authenticated to Deep Security")
 		except Exception, err:
@@ -182,23 +182,27 @@ def aws_config_rule_handler(event, context):
 			control_key = event['ruleParameters']['dsControl'].lower()
 
 			mgr.computers.get()
-			print("Searching {} computers for event source".format(len(mgr.computers)))
+			print("Searching {} computers for event source [{}]".format(len(mgr.computers), instance_id.lower().strip()))
 			for comp_id, details in mgr.computers.items():
-				if details.cloud_instance_id and (details.cloud_instance_id.lower().strip() == instance_id.lower().strip()):
-					control_status = getattr(details, 'module_status_{}'.format(control_key))
+				if details.cloud_object_instance_id and (details.cloud_object_instance_id.lower().strip() == instance_id.lower().strip()):
+					print("Found matching computer. Deep Security #{}".format(comp_id))
+					control_status = getattr(details, 'overall_{}_status'.format(control_key))
 					detailed_msg = "{} status: {}".format(control_names[control_key], control_status)
-					print(detailed_msg)
+					print("...requested control [{}] reports: {}".format(control_key, detailed_msg))
 					if control_key in [ 'anti_malware', 'integrity_monitoring' ]:
-						if "On, Real Time".lower() in control_status:
+						if "On, Real Time".lower() in control_status.lower() or " On, Security Update In Progress, Real Time".lower() in control_status.lower():
 							is_protected = True
+							print("...is protected")
 					elif control_key in [ 'intrusion_prevention' ]:
-						if "On, Prevent".lower() in control_status:
+						if "On, Prevent".lower() in control_status.lower():
 							is_protected = True
+							print("...is protected")
 					else:
-						if "On".lower() in control_status:
+						if "On".lower() in control_status.lower():
 							is_protected = True
+							print("...is protected")
 
-			mgr.finish_session() # gracefully clean up our Deep Security session
+			mgr.sign_out() # gracefully clean up our Deep Security session
 
 	# Report the results back to AWS Config
 	if detailed_msg:
