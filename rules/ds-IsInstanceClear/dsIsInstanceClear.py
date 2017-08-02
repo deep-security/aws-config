@@ -166,7 +166,7 @@ def aws_config_rule_handler(event, context):
 			print("Could not authenticate to Deep Security. Threw exception: {}".format(err))
 
 		if mgr:
-			mgr.get_computers_with_details()
+			mgr.computers.get()
 			for comp_id, details in mgr.computers.items():
 				if details.cloud_instance_id and (details.cloud_instance_id.lower().strip() == instance_id.lower().strip()):
 					detailed_msg = "Current status: {}".format(details.status_light)

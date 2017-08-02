@@ -180,7 +180,7 @@ def aws_config_rule_handler(event, context):
 				}
 			control_key = event['ruleParameters']['dsControl'].lower()
 
-			mgr.get_computers_with_details()
+			mgr.computers.get()
 			for comp_id, details in mgr.computers.items():
 				if details.cloud_instance_id and (details.cloud_instance_id.lower().strip() == instance_id.lower().strip()):
 					control_status = getattr(details, 'module_status_{}'.format(control_key))
