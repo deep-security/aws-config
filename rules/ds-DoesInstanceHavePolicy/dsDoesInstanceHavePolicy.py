@@ -158,10 +158,10 @@ def aws_config_rule_handler(event, context):
 
 	if instance_id:
 		# We know this instance ID was somehow impacted, check it's status in Deep Security
-		ds_tenant = event['ruleParameters']['dsTenant'] if event['ruleParameters'].has_key('dsTenant') else None
-		ds_hostname = event['ruleParameters']['dsHostname'] if event['ruleParameters'].has_key('dsHostname') else None
-		ds_port = event['ruleParameters']['dsPort'] if event['ruleParameters'].has_key('dsPort') else 443
-		ds_ignore_ssl_validation = bool(event['ruleParameters']['dsIgnoreSslValidation']) if event['ruleParameters'].has_key('dsIgnoreSslValidation') else False
+		ds_tenant = unicode(event['ruleParameters']['dsTenant'], "utf-8") if event['ruleParameters'].has_key('dsTenant') else None
+		ds_hostname = unicode(event['ruleParameters']['dsHostname'], "utf-8") if event['ruleParameters'].has_key('dsHostname') else None
+		ds_port = unicode(event['ruleParameters']['dsPort'], "utf-8") if event['ruleParameters'].has_key('dsPort') else 443
+		ds_ignore_ssl_validation = bool(unicode(event['ruleParameters']['dsIgnoreSslValidation'], "utf-8")) if event['ruleParameters'].has_key('dsIgnoreSslValidation') else False
 		mgr = None
 		try:
 			mgr = deepsecurity.dsm.Manager(username=event['ruleParameters']['dsUsername'], password=ds_password, tenant=ds_tenant, hostname=ds_hostname, port=ds_port, ignore_ssl_validation=ds_ignore_ssl_validation)
@@ -172,6 +172,7 @@ def aws_config_rule_handler(event, context):
 
 		if mgr:
 			mgr.computers.get()
+			print("Searching {} computers for event source".format(len(mgr.computers)))
 			for comp_id, details in mgr.computers.items():
 				if details.cloud_instance_id and (details.cloud_instance_id.lower().strip() == instance_id.lower().strip()):
 					detailed_msg = "Current policy: {}".format(details.policy_name)
