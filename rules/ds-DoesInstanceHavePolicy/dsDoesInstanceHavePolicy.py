@@ -160,23 +160,28 @@ def aws_config_rule_handler(event, context):
 		# We know this instance ID was somehow impacted, check it's status in Deep Security
 		ds_tenant = event['ruleParameters']['dsTenant'] if event['ruleParameters'].has_key('dsTenant') else None
 		ds_hostname = event['ruleParameters']['dsHostname'] if event['ruleParameters'].has_key('dsHostname') else None
+		ds_port = event['ruleParameters']['dsPort'] if event['ruleParameters'].has_key('dsPort') else 443
+		ds_ignore_ssl_validation = bool(event['ruleParameters']['dsIgnoreSslValidation']) if event['ruleParameters'].has_key('dsIgnoreSslValidation') else False
 		mgr = None
 		try:
-			mgr = deepsecurity.manager.Manager(username=event['ruleParameters']['dsUsername'], password=ds_password, tenant=ds_tenant, dsm_hostname=ds_hostname)
+			mgr = deepsecurity.dsm.Manager(username=event['ruleParameters']['dsUsername'], password=ds_password, tenant=ds_tenant, hostname=ds_hostname, port=ds_port, ignore_ssl_validation=ds_ignore_ssl_validation)
+			mgr.sign_in()
 			print("Successfully authenticated to Deep Security")
 		except Exception, err:
 			print("Could not authenticate to Deep Security. Threw exception: {}".format(err))
 
 		if mgr:
-			mgr.get_computers_with_details()
+			mgr.computers.get()
+			print("Searching {} computers for event source".format(len(mgr.computers)))
 			for comp_id, details in mgr.computers.items():
-				if details.cloud_instance_id and (details.cloud_instance_id.lower().strip() == instance_id.lower().strip()):
+				if details.cloud_object_instance_id and (details.cloud_object_instance_id.lower().strip() == instance_id.lower().strip()):
+					print("Found matching computer. Deep Security #{}".format(comp_id))
 					detailed_msg = "Current policy: {}".format(details.policy_name)
 					print(detailed_msg)
 					if details.policy_name.lower() == event['ruleParameters']['dsPolicy']:
 						has_policy = True
 
-			mgr.finish_session() # gracefully clean up our Deep Security session
+			mgr.sign_out() # gracefully clean up our Deep Security session
 
 	# Report the results back to AWS Config
 	if detailed_msg:
