@@ -2,59 +2,53 @@
 
 A set of AWS Config Rules to help ensure that your AWS deployments are leveraging the protection of Deep Security. These rules help centralize your compliance information in one place, AWS Config.
 
-## Support
 
-This is a community project and while you will see contributions from the Deep Security team, there is no official Trend Micro support for this project. The official documentation for the Deep Security APIs is available from the [Trend Micro Online Help Centre](http://docs.trendmicro.com/en-us/enterprise/deep-security.aspx). 
+## Table of Contents
 
-Tutorials, feature-specific help, and other information about Deep Security is available from the [Deep Security Help Center](https://help.deepsecurity.trendmicro.com/Welcome.html). 
+* [Architecture](#architecture)
+* [Setup](#setup)
+* [Support](#support)
+* [Contribute](#contribute)
 
-For Deep Security specific issues, please use the regular Trend Micro support channels. For issues with the code in this repository, please [open an issue here on GitHub](https://github.com/deep-security/aws-config/issues).
+## Setup
 
-<a name="permissions-in-deep-security"/>
+## Create a User in Deep Security
 
-## Permissions In Deep Security
+During execution, the AWS Lambda functions will query the Deep Security API. To do this, they require a Deep Security login with permissions.
 
-Deep Security has a strong role-based access control (RBAC) system built in. In order for these AWS Lambda functions to query Deep Security, they require credentials to sign in.
+You should set up a dedicated use account for API access. To configure the account with the minimum privileges (which reduces the risk if the credentials are exposed) required by this integration, follow the steps below.
 
-Here's the recommend configuration in order to implement this with the least amount of privileges possible within Deep Security.
+1. In Deep Security, go to *Administration > User Manager > Roles*. 
+1. Click **New**. Create a new role with a unique, meaningful name.
+1. Under **Access Type**, select **Allow Access to web services API**.
+1. Under **Access Type**, deselect **Allow Access to Deep Security Manager User Interface**.
+1. On the **Computer Rights** tab, select either **All Computers** or **Selected Computers**, ensuring that only the greyed-out **View** right (under **Allow Users to**) is selected.
+1. On the **Policy Rights** tab, select **Selected Policies**. Verify that no policies are selected. (The role does not grant rights for any policies.)
+1. On the **User Rights** tab, select **Change own password and contact information only**.
+1. On the **Other Rights* tab, verify that the default options remain, with only **View-Only** and **Hide** permissions.
+1. Go to **Administration > User Manager > Users**.
+1. Click **New**. Create a new user with a unique, meaningful name.
+1. Select the role that you created in the previous section.
 
-### Role
 
-1. Create a new Role with a unique, meaningful name  (Administration > User Manager > Roles > New...)
-1. Under "Access Type", check "Allow Access to web services API"
-1. Under "Access Type", **uncheck** "Allow Access to Deep Security Manager User Interface"
-1. On the "Computer Rights" tab, select either "All Computers" or "Selected Computers:" ensuring that only the greyed out "View" right (under "Allow Users to:") is selected
-1. On the "Policy Rights" tab, select "Selected Policies" and ensure that no policies are selected (this makes sure the role grants no rights to user for any policies)
-1. On the "User Rights" tab, ensure that "Change own password and contact information only" is selected
-1. On the "Other Rights" tab, ensure that the default options remain with only "View-Only" and "Hide" assigned as permissions
+### Configure AWS Lambda
 
-### User
-
-1. Create a new User with a unique, meaningful name (Administration > User Manager > Users > New...)
-1. Set a unique, complex password
-1. Fill in other details as desired
-1. Set the Role to the role you created in the previous section.
-
-Make sure you assign the Role to the user. This will ensure that your API access has the minimal permissions possible, which reduces the risk if the credentials are exposed.
-
-## AWS Lambda Configuration
-
-For each of these rules, the AWS Lambda configuration is the same. Please make sure to configure the following;
+Configure these for each rule:
 
 - Handler: filename_for_the_rule.aws_config_rule_handler
 - Role: a role with at least the rights as shown in [dsConfigRulePolicy.json](/dsConfigRulePolicy.json). **Remember** to change line 18 to reflect your S3 bucket information (BUCKET/PATH/TO/OBJECTS/*)
 - (Advanced Settings) Memory: 128 MB
 - (Advanced Settings) Timeout: 3m 0s
 
-## Rules
+### Rules
 
-### ds-IsInstanceProtectedByAntiMalware
+#### ds-IsInstanceProtectedByAntiMalware
 
-Checks to see if the current instance is protected by Deep Security's anti-malware controls. Anti-malware must be "on" and in "real-time" mode for the rule to be considered compliant.
+Checks to see if the current instance is protected by Deep Security Anti-Malware controls. Anti-malware must be "on" and in "real-time" mode for the rule to be considered compliant.
 
 Lambda handler: **dsIsInstanceProtectedByAntiMalware.aws_config_rule_handler**
 
-#### Rule Parameters:
+##### Rule Parameters:
 
 <table>
 <tr>
@@ -108,7 +102,7 @@ During execution, this rule sign in to the Deep Security API. You should setup a
 
 This rule requires view access to one or more computers within Deep Security.
 
-### ds-IsInstanceProtectedBy
+#### ds-IsInstanceProtectedBy
 
 Checks to see if the current instance is protected by any of Deep Security's controls. Controls must be "on" and set to their strongest setting (a/k/a "real-time" or "prevention") in order for the rule to be considered compliant.
 
@@ -116,7 +110,7 @@ This is the generic version of *ds-IsInstanceProtectedByAntiMalware*.
 
 Lambda handler: **dsIsInstanceProtectedBy.aws_config_rule_handler**
 
-#### Rule Parameters:
+##### Rule Parameters:
 
 <table>
 <tr>
@@ -175,13 +169,13 @@ During execution, this rule signs in to the Deep Security API. You should setup 
 
 This rule requires view access to one or more computers within Deep Security.
 
-### ds-DoesInstanceHavePolicy
+#### ds-DoesInstanceHavePolicy
 
 Checks to see if the current instance is protected by a specific Deep Security policy.
 
 Lambda handler: **dsDoesInstanceHavePolicy.aws_config_rule_handler**
 
-#### Rule Parameters:
+##### Rule Parameters:
 
 <table>
 <tr>
@@ -240,13 +234,13 @@ During execution, this rule signs in to the Deep Security API. You should setup 
 
 This rule requires view access to one or more computers within Deep Security.
 
-### ds-IsInstanceClear
+#### ds-IsInstanceClear
 
 Checks to see if the current instance is has any warnings, alerts, or errors in Deep Security. An instance is compliant if it does **not** have any warnings, alerts, or errors (a/k/a compliant, which means everything is working as expected with no active security alerts).
 
 Lambda handler: **dsIsInstanceClear.aws_config_rule_handler**
 
-#### Rule Parameters:
+##### Rule Parameters:
 
 <table>
 <tr>
@@ -300,13 +294,13 @@ During execution, this rule signs in to the Deep Security API. You should setup 
 
 This rule requires view access to one or more computers within Deep Security.
 
-## Risk of Credentials in AWS Config
+### Risk of Credentials in AWS Config
 
 If you're curious about the wisdom of storing access credentials in a 3rd party service... good. You've got your security hat on. Let's take a look at the risks.
 
-Right now, Deep Security uses its role-based access control to provide access to its APIs (yes, a more elegant system is on the way). This means we need to provide our AWS Lambda functions with some way of getting a set of credentials.
+Right now, Deep Security uses its role-based access control to provide access to its APIs. This means we need to provide our AWS Lambda functions with some way of getting a set of credentials.
 
-Because Deep Security sits outside of the AWS IAM structure (a/k/a it's not an AWS service), we have the following options:
+Because Deep Security sits outside of the AWS IAM structure (in other words, it's not an AWS service), we can either:
 
 1. hard-code the credentials inside the AWS Lambda function
 1. pass the credentials to the function (current method)
@@ -326,13 +320,13 @@ See [Protecting Your Deep Security Manager API Password](#protecting-your-deep-s
 
 <a name="protecting-your-deep-security-manager-api-password" />
 
-## Protecting Your Deep Security Manager API Password
+### Protect Your Deep Security Manager API Password
 
-If you're feeling nervous about having a plaintext password in your rule configuration, this section will help you get set up with an encrypted password.
+You can set up with an encrypted password.
 
 You may have noticed that the rules give you the option to specify your password as a string **or URI**, and that there are optional parameters for specifying an encryption key and an encryption context, each of which can also be provided as string or URI.
 
-We won't try to cover all of the concepts involved here in great detail, but we will give you just enough to be dangerous. If you want to learn more, the [AWS Key Management Service documentation](https://aws.amazon.com/documentation/kms/) is the best place to start.
+For details, see the [AWS Key Management Service documentation](https://aws.amazon.com/documentation/kms/).
 
 In the AWS Key Management Service (AWS KMS), you create a [Customer Master Key](http://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#master_keys). This master key remains securely stored by AWS KMS, and can be used to generate [data keys](http://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#data-keys) that are then used to encrypt individual data items, in this case your password. The encrypted data key is normally stored alongside the encrypted data. You can also optionally provide an [encryption context](http://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#encrypt_context) to allow more fine-grained access to the encrypted data.
 
