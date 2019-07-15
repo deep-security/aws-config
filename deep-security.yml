@@ -12,11 +12,6 @@ Parameters:
     Type: String
     MinLength: 1
     MaxLength: 255
-  RulesBucket:
-    Description: Name of the S3 bucket for AWS Config to store history and files
-    Type: String
-    MinLength: 1
-    MaxLength: 255
 Resources:
   dsDoesInstanceHavePolicyLambda:
     Type: AWS::Lambda::Function
@@ -70,6 +65,8 @@ Resources:
       Role: !GetAtt dsConfigRuleRole.Arn
       Runtime: python2.7
       Timeout: 60
+  dsConfigRuleBucket:
+    Type: AWS::S3::Bucket
   dsConfigRuleRole:
     Type: AWS::IAM::Role
     Properties:
@@ -91,7 +88,7 @@ Resources:
           - Action:
             - s3:GetObject
             Effect: Allow
-            Resource: !Sub arn:aws:s3:::${RulesBucket}/*
+            Resource: !Join [ "", [ !GetAtt dsConfigRuleBucket.Arn, "/*" ] ]
           - Action:
             - logs:CreateLogGroup
             - logs:CreateLogStream

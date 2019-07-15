@@ -2,6 +2,14 @@
 
 set -e
 
+[ -n "$1" ] && STACK_NAME=$1
+[ -n "$2" ] && S3_BUCKET=$2
+[ -n "$3" ] && S3_PREFIX=$3
+if [[ -z "$STACK_NAME" || -z "$S3_BUCKET" || -z "$S3_PREFIX" ]]; then
+  echo "Usage: ./deploy.sh <stack name> <s3 bucket> <s3 prefix>"
+  exit 1
+fi
+
 rm -rf deploy
 mkdir deploy
 
@@ -34,14 +42,19 @@ done
 
 rm -rf deploy/Crypto
 
-if [ -n "${S3_BASE}" ]; then
-  echo ""
-  echo "Copying zip files to S3..."
+echo ""
+echo "Copying zip files to S3..."
 
-  for i in deploy/ds-*.zip; do
-    echo "  \\c"
-    aws s3 cp $i $S3_BASE/`basename $i`
-  done
-fi
+for i in deploy/ds-*.zip; do
+echo "  \\c"
+aws s3 cp $i s3://$S3_BUCKET/$S3_PREFIX/`basename $i`
+done
 
 echo ""
+echo "Deploying lambdas..."
+
+aws cloudformation deploy \
+  --stack-name $STACK_NAME \
+  --template-file ./deep-security.yml \
+  --capabilities CAPABILITY_IAM \
+  --parameter-overrides SourceBucket=$S3_BUCKET SourcePrefix=$S3_PREFIX
