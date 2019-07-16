@@ -2,6 +2,17 @@ Transform: AWS::Serverless-2016-10-31
 Description: AWS CloudFormation template to create custom AWS Config rules that interact
   with the Trend Micro Deep Security Manager. You will be billed for the AWS resources
   used if you create a stack from this template.
+Parameters:
+  ConfigBucket:
+    Description: Name of the S3 bucket for AWS Config to store history and files
+    Type: String
+    MinLength: 1
+    MaxLength: 255
+  ConfigPrefix:
+    Description: Location in the S3 bucket where AWS Config stores history and files
+    Type: String
+    MinLength: 1
+    MaxLength: 255
 Resources:
   dsDoesInstanceHavePolicyLambda:
     Type: AWS::Serverless::Function
@@ -47,8 +58,6 @@ Resources:
       Role: !GetAtt dsConfigRuleRole.Arn
       Runtime: python2.7
       Timeout: 60
-  dsConfigRuleBucket:
-    Type: AWS::S3::Bucket
   dsConfigRuleRole:
     Type: AWS::IAM::Role
     Properties:
@@ -70,7 +79,7 @@ Resources:
           - Action:
             - s3:GetObject
             Effect: Allow
-            Resource: !Join [ "", [ !GetAtt dsConfigRuleBucket.Arn, "/*" ] ]
+            Resource: !Sub arn:aws:s3:::${ConfigBucket}/${ConfigPrefix}/*
           - Action:
             - logs:CreateLogGroup
             - logs:CreateLogStream
