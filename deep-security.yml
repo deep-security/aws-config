@@ -1,24 +1,12 @@
+Transform: AWS::Serverless-2016-10-31
 Description: AWS CloudFormation template to create custom AWS Config rules that interact
   with the Trend Micro Deep Security Manager. You will be billed for the AWS resources
   used if you create a stack from this template.
-Parameters:
-  SourceBucket:
-    Description: Name of the S3 bucket that you have stored the rule zip files in.
-    Type: String
-    MinLength: 1
-    MaxLength: 255
-  SourcePrefix:
-    Description: Location in the S3 bucket where you have stored the rule zip files.
-    Type: String
-    MinLength: 1
-    MaxLength: 255
 Resources:
   dsDoesInstanceHavePolicyLambda:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
     Properties:
-      Code:
-        S3Bucket: !Ref SourceBucket
-        S3Key: !Sub ${SourcePrefix}/ds-DoesInstanceHavePolicy.zip
+      CodeUri: rules/ds-DoesInstanceHavePolicy
       Description: Custom AWS Config rule that checks with the Trend Micro Deep Security
         Manager to see if the named policy is in effect. See https://github.com/deep-security/aws-config
         for more details.
@@ -27,11 +15,9 @@ Resources:
       Runtime: python2.7
       Timeout: 60
   dsIsInstanceClearLambda:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
     Properties:
-      Code:
-        S3Bucket: !Ref SourceBucket
-        S3Key: !Sub ${SourcePrefix}/ds-IsInstanceClear.zip
+      CodeUri: rules/ds-IsInstanceClear
       Description: Custom AWS Config rule that checks with the Trend Micro Deep Security
         Manager to see if the instance is clear of any alerts, warnings, or errors.
         See https://github.com/deep-security/aws-config for more details.
@@ -40,11 +26,9 @@ Resources:
       Runtime: python2.7
       Timeout: 60
   dsIsInstanceProtectedByLambda:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
     Properties:
-      Code:
-        S3Bucket: !Ref SourceBucket
-        S3Key: !Sub ${SourcePrefix}/ds-IsInstanceProtectedBy.zip
+      CodeUri: rules/ds-IsInstanceProtectedBy
       Description: Custom AWS Config rule that checks with the Trend Micro Deep Security
         Manager to see if the instance is protected using the specified security control.
         See https://github.com/deep-security/aws-config for more details.
@@ -53,11 +37,9 @@ Resources:
       Runtime: python2.7
       Timeout: 60
   dsIsInstanceProtectedByAntiMalwareLambda:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
     Properties:
-      Code:
-        S3Bucket: !Ref SourceBucket
-        S3Key: !Sub ${SourcePrefix}/ds-IsInstanceProtectedByAntiMalware.zip
+      CodeUri: rules/ds-IsInstanceProtectedByAntiMalware
       Description: Custom AWS Config rule that checks with the Trend Micro Deep Security
         Manager to see if the instance is protected using the anti-malware security
         control. See https://github.com/deep-security/aws-config for more details.
