@@ -3,10 +3,10 @@
 set -e
 
 echo ""
-echo "Copying dependencies..."
+echo "Cleaning up..."
 
 for i in rules/*; do
-  cp -r src $i
+  rm -rf $i/Crypto $i/src
 done
 
 echo ""

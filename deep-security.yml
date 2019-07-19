@@ -9,10 +9,35 @@ Parameters:
     MinLength: 1
     MaxLength: 255
   ConfigPrefix:
-    Description: Location in the S3 bucket where AWS Config stores history and files
+    Description: Object prefix inside config bucket
     Type: String
     MinLength: 1
     MaxLength: 255
+  DSUsernameKey:
+    Description: Parameter Store key name for Deep Security Manager username
+    Type: String
+  DSPasswordKey:
+    Description: Parameter Store key name for Deep Security Manager password
+    Type: String
+  DSHostname:
+    Description: Deep Security Manager hostname
+    Type: String
+  DSPort:
+    Description: Deep Security Manager port
+    Type: Number
+  DSTenant:
+    Description: Deep Security tenant name
+    Type: String
+  DSIgnoreSslValidation:
+    Description: Whether to ignore SSL validation on connection
+    Type: String
+  DSPolicy:
+    Description: Deep Security policy to check against
+    Type: String
+  DSControl:
+    Description: Deep Security protection name to check against
+    Type: String
+    AllowedValues: [ anti_malware, web_reputation, firewall, intrusion_prevention, integrity_monitoring, log_inspection ]
 Resources:
   dsDoesInstanceHavePolicyLambda:
     Type: AWS::Serverless::Function
@@ -25,6 +50,12 @@ Resources:
       Role: !GetAtt dsConfigRuleRole.Arn
       Runtime: python2.7
       Timeout: 60
+  dsDoesInstanceHavePolicyLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt dsDoesInstanceHavePolicyLambda.Arn
+      Action: lambda:InvokeFunction
+      Principal: config.amazonaws.com
   dsIsInstanceClearLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -36,6 +67,12 @@ Resources:
       Role: !GetAtt dsConfigRuleRole.Arn
       Runtime: python2.7
       Timeout: 60
+  dsIsInstanceClearLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt dsIsInstanceClearLambda.Arn
+      Action: lambda:InvokeFunction
+      Principal: config.amazonaws.com
   dsIsInstanceProtectedByLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -47,6 +84,12 @@ Resources:
       Role: !GetAtt dsConfigRuleRole.Arn
       Runtime: python2.7
       Timeout: 60
+  dsIsInstanceProtectedByLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt dsIsInstanceProtectedByLambda.Arn
+      Action: lambda:InvokeFunction
+      Principal: config.amazonaws.com
   dsIsInstanceProtectedByAntiMalwareLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -58,6 +101,12 @@ Resources:
       Role: !GetAtt dsConfigRuleRole.Arn
       Runtime: python2.7
       Timeout: 60
+  dsIsInstanceProtectedByAntiMalwareLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt dsIsInstanceProtectedByAntiMalwareLambda.Arn
+      Action: lambda:InvokeFunction
+      Principal: config.amazonaws.com
   dsConfigRuleRole:
     Type: AWS::IAM::Role
     Properties:
@@ -72,6 +121,17 @@ Resources:
       - PolicyName: dsConfigRulePolicy
         PolicyDocument:
           Statement:
+          - Action:
+            - ssm:DescribeParameters
+            Effect: Allow
+            Resource: '*'
+          - Action:
+            - ssm:GetParameter
+            - ssm:GetParameters
+            Effect: Allow
+            Resource:
+            - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${DSUsernameKey}
+            - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${DSPasswordKey}
           - Action:
             - kms:Decrypt
             Effect: Allow
@@ -91,6 +151,109 @@ Resources:
             - config:PutEvaluations
             Effect: Allow
             Resource: '*'
+  dsDoesInstanceHavePolicyRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      Description: This rule checks with the Trend Micro Deep Security
+        Manager to see if the named policy is in effect.
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::Instance
+      Source:
+        Owner: CUSTOM_LAMBDA
+        SourceIdentifier: !GetAtt dsDoesInstanceHavePolicyLambda.Arn
+        SourceDetails:
+          - EventSource: aws.config
+            MessageType: ConfigurationItemChangeNotification
+          - EventSource: aws.config
+            MessageType: OversizedConfigurationItemChangeNotification
+      InputParameters:
+        dsUsernameKey: !Ref DSUsernameKey
+        dsPasswordKey: !Ref DSPasswordKey
+        dsHostname: !Ref DSHostname
+        dsPort: !Ref DSPort
+        dsTenant: !Ref DSTenant
+        dsIgnoreSslValidation: !Ref DSIgnoreSslValidation
+        dsPolicy: !Ref DSPolicy
+    DependsOn:
+      - dsDoesInstanceHavePolicyLambdaPermission
+  dsIsInstanceClearRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      Description: This rule checks with the Trend Micro Deep Security Manager to see
+        if the instance is clear of any alerts, warnings, or errors.
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::Instance
+      Source:
+        Owner: CUSTOM_LAMBDA
+        SourceIdentifier: !GetAtt dsIsInstanceClearLambda.Arn
+        SourceDetails:
+          - EventSource: aws.config
+            MessageType: ConfigurationItemChangeNotification
+          - EventSource: aws.config
+            MessageType: OversizedConfigurationItemChangeNotification
+      InputParameters:
+        dsUsernameKey: !Ref DSUsernameKey
+        dsPasswordKey: !Ref DSPasswordKey
+        dsHostname: !Ref DSHostname
+        dsPort: !Ref DSPort
+        dsTenant: !Ref DSTenant
+        dsIgnoreSslValidation: !Ref DSIgnoreSslValidation
+    DependsOn:
+      - dsIsInstanceClearLambdaPermission
+  dsIsInstanceProtectedByRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      Description: This rule checks with the Trend Micro Deep Security
+        Manager to see if the instance is protected using the specified security control.
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::Instance
+      Source:
+        Owner: CUSTOM_LAMBDA
+        SourceIdentifier: !GetAtt dsIsInstanceProtectedByLambda.Arn
+        SourceDetails:
+          - EventSource: aws.config
+            MessageType: ConfigurationItemChangeNotification
+          - EventSource: aws.config
+            MessageType: OversizedConfigurationItemChangeNotification
+      InputParameters:
+        dsUsernameKey: !Ref DSUsernameKey
+        dsPasswordKey: !Ref DSPasswordKey
+        dsHostname: !Ref DSHostname
+        dsPort: !Ref DSPort
+        dsTenant: !Ref DSTenant
+        dsIgnoreSslValidation: !Ref DSIgnoreSslValidation
+        dsControl: !Ref DSControl
+    DependsOn:
+      - dsIsInstanceProtectedByLambdaPermission
+  dsIsInstanceProtectedByAntiMalwareRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      Description: This rule checks with the Trend Micro Deep Security
+        Manager to see if the instance is protected using the anti-malware security
+        control.
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::Instance
+      Source:
+        Owner: CUSTOM_LAMBDA
+        SourceIdentifier: !GetAtt dsIsInstanceProtectedByAntiMalwareLambda.Arn
+        SourceDetails:
+          - EventSource: aws.config
+            MessageType: ConfigurationItemChangeNotification
+          - EventSource: aws.config
+            MessageType: OversizedConfigurationItemChangeNotification
+      InputParameters:
+        dsUsernameKey: !Ref DSUsernameKey
+        dsPasswordKey: !Ref DSPasswordKey
+        dsHostname: !Ref DSHostname
+        dsPort: !Ref DSPort
+        dsTenant: !Ref DSTenant
+        dsIgnoreSslValidation: !Ref DSIgnoreSslValidation
+    DependsOn:
+      - dsIsInstanceProtectedByAntiMalwareLambdaPermission
 Outputs:
   dsDoesInstanceHavePolicyLambda:
     Description: ARN for the dsDoesInstanceHavePolicy lambda
