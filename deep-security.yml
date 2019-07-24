@@ -25,12 +25,15 @@ Parameters:
   DSPort:
     Description: Deep Security Manager port
     Type: Number
+    Default: 443
   DSTenant:
     Description: Deep Security tenant name
     Type: String
+    Default: ''
   DSIgnoreSslValidation:
     Description: Whether to ignore SSL validation on connection
     Type: String
+    Default: false
   DSPolicy:
     Description: Deep Security policy to check against
     Type: String
@@ -112,8 +115,7 @@ Resources:
     Properties:
       AssumeRolePolicyDocument:
         Statement:
-        - Sid: AllowLambdaAssumeRole
-          Effect: Allow
+        - Effect: Allow
           Principal:
             Service: lambda.amazonaws.com
           Action: sts:AssumeRole
@@ -122,16 +124,10 @@ Resources:
         PolicyDocument:
           Statement:
           - Action:
-            - ssm:DescribeParameters
-            Effect: Allow
-            Resource: '*'
-          - Action:
             - ssm:GetParameter
-            - ssm:GetParameters
             Effect: Allow
             Resource:
-            - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${DSUsernameKey}
-            - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${DSPasswordKey}
+            - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/*
           - Action:
             - kms:Decrypt
             Effect: Allow

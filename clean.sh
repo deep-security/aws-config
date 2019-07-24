@@ -6,7 +6,9 @@ echo ""
 echo "Cleaning up..."
 
 for i in rules/*; do
-  rm -rf $i/Crypto $i/src
+  rm -rf $i/src $i/tests $i/requirements.txt
 done
+
+rm -rf .aws-sam
 
 echo ""

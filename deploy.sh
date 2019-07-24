@@ -5,32 +5,36 @@ set -e
 source deploy.config
 
 if [[ -z "$STACK_NAME" || \
-  -z "$LAMBDA_BUCKET" || \
-  -z "$LAMBDA_PREFIX" || \
   -z "$CONFIG_BUCKET" || \
   -z "$CONFIG_PREFIX" || \
-  -z "$DS_HOSTNAME" ]]
+  -z "$DS_USERNAME_PARAM_STORE_KEY" || \
+  -z "$DS_PASSWORD_PARAM_STORE_KEY" || \
+  -z "$DS_HOSTNAME" || \
+  -z "$DS_POLICY" || \
+  -z "$DS_CONTROL" ]]
 then
   echo "" >&2
-  echo "Required parameters missing in deploy.config." >&2
+  echo "Required parameters missing in 'deploy.config':" >&2
+  echo "  - STACK_NAME" >&2
+  echo "  - CONFIG_BUCKET" >&2
+  echo "  - CONFIG_PREFIX" >&2
+  echo "  - DS_USERNAME_PARAM_STORE_KEY" >&2
+  echo "  - DS_PASSWORD_PARAM_STORE_KEY" >&2
+  echo "  - DS_HOSTNAME" >&2
+  echo "  - DS_POLICY" >&2
+  echo "  - DS_CONTROL" >&2
   echo "" >&2
   exit 1
 fi
 
-./build.sh
+./package.sh
 
 echo ""
-echo "Packaging and deploying lambdas..."
+echo "Deploying Lambda functions and Config rules..."
 
-aws cloudformation package \
-  --template-file deep-security.yml \
-  --s3-bucket "$LAMBDA_BUCKET" \
-  --s3-prefix "$LAMBDA_PREFIX" \
-  --output-template-file transformed.template
-
-aws cloudformation deploy \
+sam deploy \
   --stack-name "$STACK_NAME" \
-  --template-file transformed.template \
+  --template-file packaged.yml \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides \
     ConfigBucket="$CONFIG_BUCKET" \
@@ -45,3 +49,5 @@ aws cloudformation deploy \
     DSControl="$DS_CONTROL"
 
 ./clean.sh
+
+echo ""

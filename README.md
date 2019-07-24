@@ -53,12 +53,17 @@ You should set up a dedicated use account for API access. To configure the accou
 
 #### Prerequisite
 
-- AWS CLI command line tools installed
+- AWS SAM CLI command line tools ([instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
 - Properly configured AWS credentials locally for executing AWS CLI
+- Python 2.7
 
 #### Steps
 
 - Run `./deploy.sh`
+
+### Unit Tests
+
+- Run `pytest -s -vv tests/unit`
 
 ### Rules
 
