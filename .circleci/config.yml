@@ -91,6 +91,16 @@ jobs:
               --s3-prefix "$LAMBDA_PREFIX" \
               --output-template-file circleci-ws/packaged.yml
 
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+      - run:
+          name: Scan cfn template for vulnerabilities (cfn_nag)
+          command: |
+            docker create -v /templates --name cfn_nag stelligent/cfn_nag /bin/true
+            docker cp $PWD/circleci-ws/packaged.yml cfn_nag:/templates
+            docker run --volumes-from cfn_nag stelligent/cfn_nag /templates/packaged.yml
+
       - persist_to_workspace:
           root: circleci-ws
           paths:
