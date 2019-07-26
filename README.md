@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/stelligent/deep-security.svg?style=svg)](https://circleci.com/gh/stelligent/deep-security)
+
 # AWS Config Rules for Deep Security
 
 A set of AWS Config Rules to help ensure that your AWS deployments are leveraging the protection of Deep Security. These rules help centralize your compliance information in one place, AWS Config.
@@ -31,39 +33,53 @@ You should set up a dedicated use account for API access. To configure the accou
 1. Select the role that you created in the previous section.
 
 
-### Configure AWS Lambda - `deploy.config`
-
-**_Important: These settings must be updated accordingly before deploy_**
-
-- `STACK_NAME`: CloudFormation stack name for all lambda and Config rule resources
-- `LAMBDA_BUCKET`: S3 bucket name where Lambda source code is uploaded
-- `LAMBDA_PREFIX`: S3 object prefix within `LAMBDA_BUCKET`
-- `CONFIG_BUCKET`: S3 bucket name where AWS Config to store history and files
-- `CONFIG_PREFIX`: S3 object prefix within `CONFIG_BUCKET`
-- `DS_HOSTNAME`: Deep Security Manager host name
-- `DS_PORT`: Deep Security Manager host port
-- `DS_TENANT`: Deep Security tenant name if there is one
-- `DS_IGNORE_SSL_VALIDATION`: Whether to validate SSL connection to Deep Security Manager
-- `DS_USERNAME_PARAM_STORE_KEY`: SSM Parameter Store key to retrieve Deep Security username
-- `DS_PASSWORD_PARAM_STORE_KEY`: SSM Parameter Store key to retrieve Deep Security password
-- `DS_POLICY`: Policy name to check used by `DoesInstanceHavePolicy` Lambda
-- `DS_CONTROL`: Control name to check used by `IsInstanceProtectedBy` Lambda
-
 ### Deploy AWS Lambda and Config rules
 
-#### Prerequisite
+#### From command line
 
-- AWS SAM CLI command line tools ([instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
-- Properly configured AWS credentials locally for executing AWS CLI
-- Python 2.7
+> Configuration settings - `deploy.config`
+>
+> **_Important: These settings must be updated accordingly before deploy_**
+>
+> - `STACK_NAME`: CloudFormation stack name for all lambda and Config rule resources
+> - `LAMBDA_BUCKET`: S3 bucket name where Lambda source code is uploaded
+> - `LAMBDA_PREFIX`: S3 object prefix within `LAMBDA_BUCKET`
+> - `CONFIG_BUCKET`: S3 bucket name where AWS Config to store history and files
+> - `CONFIG_PREFIX`: S3 object prefix within `CONFIG_BUCKET`
+> - `DS_HOSTNAME`: Deep Security Manager host name
+> - `DS_PORT`: Deep Security Manager host port
+> - `DS_TENANT`: Deep Security tenant name if there is one
+> - `DS_IGNORE_SSL_VALIDATION`: Whether to validate SSL connection to Deep Security Manager
+> - `DS_USERNAME_PARAM_STORE_KEY`: SSM Parameter Store key to retrieve Deep Security username
+> - `DS_PASSWORD_PARAM_STORE_KEY`: SSM Parameter Store key to retrieve Deep Security password
+> - `DS_POLICY`: Policy name to check used by `DoesInstanceHavePolicy` Lambda
+> - `DS_CONTROL`: Control name to check used by `IsInstanceProtectedBy` Lambda
+>
+> Prerequisite
+>
+> - AWS SAM CLI command line tools ([instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
+> - Properly configured AWS credentials locally for executing AWS CLI
+> - Python 2.7
+>
+> Steps
+>
+> - Run `./deploy.sh`
+>
+> Unit Tests
+>
+> - Run `pytest -s -vv tests/unit`
+>
+> Publish to AWS Serverless Application Repository
+>
+> - Run `./publish.sh`
 
-#### Steps
+#### With [circleci](https://circleci.com/)
 
-- Run `./deploy.sh`
+> Configuration settings - `circleci` project
+>
+> - Add variables from `deploy.config` as `Environment Variables` in `circleci` project
+> - Add AWS credentials and region information as `Environment Variables` in `circleci` project
 
-### Unit Tests
-
-- Run `pytest -s -vv tests/unit`
 
 ### Rules
 

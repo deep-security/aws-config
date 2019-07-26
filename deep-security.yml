@@ -41,6 +41,19 @@ Parameters:
     Description: Deep Security protection name to check against
     Type: String
     AllowedValues: [ anti_malware, web_reputation, firewall, intrusion_prevention, integrity_monitoring, log_inspection ]
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: Deep-Security-Config-Rules
+    Description: A set of AWS Config Rules to help ensure that your AWS deployments are leveraging the protection of Deep Security.
+      These rules help centralize your compliance information in one place, AWS Config.
+    Author: Stelligent
+    SpdxLicenseId: Apache-2.0
+    LicenseUrl: LICENSE
+    ReadmeUrl: README.md
+    Labels: ['trendmicro', 'deepsecurity', 'security', 'config']
+    HomePageUrl: https://github.com/stelligent/deep-security
+    SemanticVersion: 0.0.1
+    SourceCodeUrl: https://github.com/stelligent/deep-security
 Resources:
   dsDoesInstanceHavePolicyLambda:
     Type: AWS::Serverless::Function

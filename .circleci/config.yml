@@ -1,0 +1,164 @@
+version: 2.1
+
+executors:
+  python27-executor:
+    docker:
+      - image: circleci/python:2.7
+
+commands:
+  install-test-suite:
+    description: Install boto3, pytest, mock
+    steps:
+      - restore_cache:
+          keys:
+            - cache-test-suite-20190725
+
+      - run:
+          name: Installing test suite
+          command: |
+            virtualenv ./venv
+            . venv/bin/activate
+            pip install boto3 pytest mock
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: cache-test-suite-20190725
+
+  install-sam:
+    description: Install AWS SAM
+    steps:
+      - restore_cache:
+          keys:
+            - cache-sam-20190725
+
+      - run:
+          name: Installing AWS SAM CLI
+          command: |
+            virtualenv ./venv
+            . venv/bin/activate
+            pip install awscli aws-sam-cli
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: cache-sam-20190725
+
+jobs:
+  unit-tests:
+    executor: python27-executor
+
+    steps:
+      - checkout
+
+      - install-test-suite
+
+      - run:
+          name: Running unit tests
+          command: |
+            . venv/bin/activate
+            pytest -s -vv tests/unit
+
+  package:
+    executor: python27-executor
+
+    steps:
+      - checkout
+
+      - install-sam
+
+      - run:
+          name: Copying Deep Security dependencies
+          command: |
+            for i in rules/*; do
+              cp -r src requirements.txt $i
+            done
+
+      - run:
+          name: Building from source
+          command: |
+            . venv/bin/activate
+            sam build -t deep-security.yml
+
+      - run:
+          name: Packaging Lambda functions
+          command: |
+            . venv/bin/activate
+            mkdir -p circleci-ws
+            sam package \
+              --template-file .aws-sam/build/template.yaml \
+              --s3-bucket "$LAMBDA_BUCKET" \
+              --s3-prefix "$LAMBDA_PREFIX" \
+              --output-template-file circleci-ws/packaged.yml
+
+      - persist_to_workspace:
+          root: circleci-ws
+          paths:
+            - packaged.yml
+
+  deploy:
+    executor: python27-executor
+
+    steps:
+      - attach_workspace:
+          at: circleci-ws
+
+      - install-sam
+
+      - run:
+          name: Deploying Lambda functions and Config rules
+          command: |
+            . venv/bin/activate
+            sam deploy \
+              --stack-name "$STACK_NAME" \
+              --template-file circleci-ws/packaged.yml \
+              --capabilities CAPABILITY_IAM \
+              --parameter-overrides \
+                ConfigBucket="$CONFIG_BUCKET" \
+                ConfigPrefix="$CONFIG_PREFIX" \
+                DSUsernameKey="$DS_USERNAME_PARAM_STORE_KEY" \
+                DSPasswordKey="$DS_PASSWORD_PARAM_STORE_KEY" \
+                DSHostname="$DS_HOSTNAME" \
+                DSPort="$DS_PORT" \
+                DSTenant="$DS_TENANT" \
+                DSIgnoreSslValidation="$DS_IGNORE_SSL_VALIDATION" \
+                DSPolicy="$DS_POLICY" \
+                DSControl="$DS_CONTROL"
+
+  publish:
+    executor: python27-executor
+
+    steps:
+      - attach_workspace:
+          at: circleci-ws
+
+      - install-sam
+
+      - run:
+          name: Publish to AWS Serverless Application Repository
+          command: |
+            . venv/bin/activate
+            sam publish --template circleci-ws/packaged.yml
+
+workflows:
+  version: 2
+
+  wf-deploy:
+    jobs:
+      - unit-tests
+      - package:
+          requires:
+            - unit-tests
+      - deploy:
+          requires:
+            - package
+
+  wf-publish:
+    jobs:
+      - unit-tests
+      - package:
+          requires:
+            - unit-tests
+      - publish:
+          requires:
+            - package
