@@ -19,7 +19,7 @@ class CloudAccounts(core.CoreDict):
     call = self.manager._get_request_format(api=self.manager.API_TYPE_REST, call='cloudaccounts')
     response = self.manager._request(call)
     if response and response['status'] == 200:
-      if response['data'] and response['data'].has_key('cloudAccountListing') and response['data']['cloudAccountListing'].has_key('cloudAccounts'):
+      if response['data'] and 'cloudAccountListing' in response['data'] and 'cloudAccounts' in response['data']['cloudAccountListing']:
         for cloud_account in response['data']['cloudAccountListing']['cloudAccounts']:
           cloud_account_obj = CloudAccount(self.manager, cloud_account, self.log)
           self[cloud_account_obj.cloud_account_id] = cloud_account_obj
@@ -46,7 +46,7 @@ class CloudAccounts(core.CoreDict):
     }
 
     regions_to_add = []
-    if regions.has_key(region):
+    if region in regions:
       regions_to_add.append(region)
     elif region == 'all':
       regions_to_add = regions.keys()

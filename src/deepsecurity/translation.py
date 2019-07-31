@@ -46,7 +46,7 @@ class Terms(object):
     For the given new term, return the original API term
     """
     result = term_new
-    if self.new_to_api.has_key(term_new):
+    if term_new in self.new_to_api:
         result = self.new_to_api[term_new]
 
     return result
@@ -56,7 +56,7 @@ class Terms(object):
     """
     Return the translation of the specified API term
     """
-    if self.api_to_new.has_key(term.lower()):
+    if term.lower() in self.api_to_new:
       return self.api_to_new[term.lower()]
     else:
       return term

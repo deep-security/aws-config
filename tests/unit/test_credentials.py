@@ -1,5 +1,5 @@
 import datetime
-from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
 from src.deepsecurity.credentials import Credentials
 
 

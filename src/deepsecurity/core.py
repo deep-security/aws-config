@@ -4,8 +4,8 @@ import json
 import logging
 import re
 import ssl
-import urllib
-import urllib2
+from urllib.request import build_opener, HTTPSHandler, Request
+from urllib.parse import urlencode
 
 # 3rd party libraries
 import libs.xmltodict as xmltodict
@@ -128,7 +128,7 @@ class CoreApi(object):
       'api',
       'call'
       ]:
-      if not request.has_key(required_key) and request[required_key]:
+      if not (required_key in request and request[required_key]):
         self.log("All requests are required to have a key [{}] with a value".format(required_key), level='critical')
         return None
 
@@ -156,13 +156,13 @@ class CoreApi(object):
       if not v: request[k] = None
 
     # prep the query string
-    if request.has_key('query') and request['query']:
+    if 'query' in request and request['query']:
       # get with query string
       qs = {}
       for k, v in request['query'].items(): # strip out null entries
         if v: qs[k] = v
 
-      url += '?%s' % urllib.urlencode(qs)
+      url += '?%s' % urlencode(qs)
       self.log("Added query string. Full URL is now {}".format(url), level='debug')
 
     self.log("URL to request is: {}".format(url))
@@ -175,7 +175,7 @@ class CoreApi(object):
       self.log("SSL certificate validation has been disabled for this call", level='warning')
 
     # Prep the URL opener
-    url_opener = urllib2.build_opener(urllib2.HTTPSHandler(context=ssl_context))
+    url_opener = build_opener(HTTPSHandler(context=ssl_context))
   
     # Prep the request
     request_type = 'GET'
@@ -207,31 +207,31 @@ class CoreApi(object):
         'content-type': 'application/soap+xml'
         }
       data = self._prep_data_for_soap(request['call'], request['data'])
-      url_request = urllib2.Request(url, data=data, headers=headers)
+      url_request = Request(url, data=data, headers=headers)
       request_type = 'POST'
       self.log("Making a SOAP request with headers {}".format(headers), level='debug')
       self.log("   and data {}".format(data), level='debug')
     elif request['call'] == 'authentication/logout':
-      url_request = urllib2.Request(url, headers=headers)
+      url_request = Request(url, headers=headers)
       setattr(url_request, 'get_method', lambda: 'DELETE') # make this request use the DELETE HTTP verb
       request_type = 'DELETE'
       self.log("Making a REST DELETE request with headers {}".format(headers), level='debug')
-    elif request.has_key('data') and request['data']:
+    elif 'data' in request and request['data']:
       # POST
-      url_request = urllib2.Request(url, data=json.dumps(request['data']), headers=headers)
+      url_request = Request(url, data=json.dumps(request['data']).encode('utf-8'), headers=headers)
       request_type = 'POST'
       self.log("Making a REST POST request with headers {}".format(headers), level='debug')
       self.log("    and data {}".format(request['data']), level='debug')
     else:
       # GET
-      url_request = urllib2.Request(url, headers=headers)
+      url_request = Request(url, headers=headers)
       self.log("Making a REST GET request with headers {}".format(headers), level='debug')
 
     # Make the request
     response = None
     try:
       response = url_opener.open(url_request)
-    except Exception, url_err:
+    except Exception as url_err:
       self.log("Failed to make {} {} call [{}]".format(request['api'].upper(), request_type, request['call'].lstrip('/')), err=url_err)
 
     # Convert the request from JSON
@@ -250,16 +250,16 @@ class CoreApi(object):
         try:
           if result['raw']:
             full_data = xmltodict.parse(result['raw'])
-            if full_data.has_key('soapenv:Envelope') and full_data['soapenv:Envelope'].has_key('soapenv:Body'):
+            if 'soapenv:Envelope' in full_data and 'soapenv:Body' in full_data['soapenv:Envelope']:
               result['data'] = full_data['soapenv:Envelope']['soapenv:Body']
-              if result['data'].has_key('{}Response'.format(request['call'])):
-                if result['data']['{}Response'.format(request['call'])].has_key('{}Return'.format(request['call'])):
+              if '{}Response'.format(request['call']) in result['data']:
+                if '{}Return'.format(request['call']) in result['data']['{}Response'.format(request['call'])]:
                   result['data'] = result['data']['{}Response'.format(request['call'])]['{}Return'.format(request['call'])]
                 else:
                   result['data'] = result['data']['{}Response'.format(request['call'])]
             else:
               result['data'] = full_data
-        except Exception, xmltodict_err:
+        except Exception as xmltodict_err:
           self.log("Could not convert response from call {}".format(request['call']), err=xmltodict_err)
       else:
         # JSON response
@@ -267,7 +267,7 @@ class CoreApi(object):
           if result['raw'] and result['status'] != 204:
             result['type'] = result['headers']['content-type']
             result['data'] = json.loads(result['raw']) if 'json' in result['type'] else None
-        except Exception, json_err:
+        except Exception as json_err:
           # report the exception as 'info' because it's not fatal and the data is 
           # still captured in result['raw']
           self.log("Could not convert response from call {} to JSON. Threw exception:\n\t{}".format(request['call'], json_err), level='info')
@@ -295,7 +295,7 @@ class CoreApi(object):
     Prepare the complete XML SOAP envelope
     """
     data = xmltodict.unparse(self._prefix_keys('ns1', { call: details }), pretty=False, full_document=False)
-    soap_xml = u"""
+    soap_xml = """
     <?xml version="1.0" encoding="UTF-8"?>
     <SOAP-ENV:Envelope xmlns:ns0="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="urn:Manager" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       <SOAP-ENV:Header/>
@@ -330,7 +330,7 @@ class CoreApi(object):
     try:
       func = getattr(self.logger, level.lower())
       func(message)
-    except Exception, log_err:
+    except Exception as log_err:
       self.logger.critical("Could not write to log. Threw exception:\n\t{}".format(log_err))
 
 class CoreDict(dict):
@@ -390,13 +390,13 @@ class CoreDict(dict):
           attr_to_check = None
           if match_attr in dir(item):
             attr_to_check = getattr(item, match_attr)
-          elif 'has_key' in dir(item) and item.has_key(match_attr):
+          elif isinstance(item, dict) and match_attr in item:
             attr_to_check = item[match_attr]
 
           if attr_to_check:
             # does the property match the specified values?
             for match_attr_val in match_attr_vals:
-              if type(attr_to_check) in [type(''), type(u'')]:
+              if type(attr_to_check) == type(''):
                 # string comparison
                 match = re.search(r'{}'.format(match_attr_val), attr_to_check)
                 if match:
@@ -430,7 +430,7 @@ class CoreObject(object):
     """
     for k, v in api_response.items():
       val = v
-      if 'has_key' in dir(v) and v.has_key(u'@xsi:nil') and v[u'@xsi:nil'] == u'true':
+      if isinstance(v, dict) and '@xsi:nil' in v and v['@xsi:nil'] == 'true':
         val = None
 
       new_key = translation.Terms.get(k)
@@ -445,7 +445,7 @@ class CoreObject(object):
 
       try:
         setattr(self, new_key, val)
-      except Exception, err:
+      except Exception as err:
         if log_func:
           log_func("Could not set property {} to value {} for object {}".format(k, v, s))
           try:
@@ -524,13 +524,13 @@ class CoreList(list):
           attr_to_check = None
           if match_attr in dir(item):
             attr_to_check = getattr(item, match_attr)
-          elif 'has_key' in dir(item) and item.has_key(match_attr):
+          elif isinstance(item, dict) and match_attr in item:
             attr_to_check = item[match_attr]
 
           if attr_to_check:
             # does the property match the specified values?
             for match_attr_val in match_attr_vals:
-              if type(attr_to_check) in [type(''), type(u'')]:
+              if type(attr_to_check) == type(''):
                 # string comparison
                 match = re.search(r'{}'.format(match_attr_val), attr_to_check)
                 if match:

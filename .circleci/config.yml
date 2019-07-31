@@ -1,13 +1,13 @@
 version: 2.1
 
 executors:
-  python27-executor:
+  python37-executor:
     docker:
-      - image: circleci/python:2.7
+      - image: circleci/python:3.7
 
 commands:
   install-test-suite:
-    description: Install boto3, pytest, mock
+    description: Install boto3, pytest
     steps:
       - restore_cache:
           keys:
@@ -16,9 +16,9 @@ commands:
       - run:
           name: Installing test suite
           command: |
-            virtualenv ./venv
+            python -m venv venv
             . venv/bin/activate
-            pip install boto3 pytest mock
+            pip install boto3 pytest
 
       - save_cache:
           paths:
@@ -35,7 +35,7 @@ commands:
       - run:
           name: Installing AWS SAM CLI
           command: |
-            virtualenv ./venv
+            python -m venv venv
             . venv/bin/activate
             pip install awscli aws-sam-cli
 
@@ -46,7 +46,7 @@ commands:
 
 jobs:
   unit-tests:
-    executor: python27-executor
+    executor: python37-executor
 
     steps:
       - checkout
@@ -60,7 +60,7 @@ jobs:
             pytest -s -vv tests/unit
 
   package:
-    executor: python27-executor
+    executor: python37-executor
 
     steps:
       - checkout
@@ -107,7 +107,7 @@ jobs:
             - packaged.yml
 
   deploy:
-    executor: python27-executor
+    executor: python37-executor
 
     steps:
       - attach_workspace:
@@ -136,7 +136,7 @@ jobs:
                 DSControl="$DS_CONTROL"
 
   publish:
-    executor: python27-executor
+    executor: python37-executor
 
     steps:
       - attach_workspace:
@@ -162,6 +162,9 @@ workflows:
       - deploy:
           requires:
             - package
+          filters:
+            branches:
+              only: master
 
   wf-publish:
     jobs:
@@ -172,3 +175,6 @@ workflows:
       - publish:
           requires:
             - package
+          filters:
+            branches:
+              only: master

@@ -36,11 +36,11 @@ class Manager(core.CoreApi):
 
     # allow for explicit override
     if tenant:
-      self._tenant = unicode(tenant, "utf-8") if not type(tenant) == type(unicode("")) else tenant
+      self._tenant = str(tenant, "utf-8") if not type(tenant) == type(str("")) else tenant
     if username:
-      self._username = unicode(username, "utf-8") if not type(username) == type(unicode("")) else username
+      self._username = str(username, "utf-8") if not type(username) == type(str("")) else username
     if password:
-      self._password = unicode(password, "utf-8") if not type(password) == type(unicode("")) else password
+      self._password = str(password, "utf-8") if not type(password) == type(str("")) else password
 
     self.computer_groups = computers.ComputerGroups(manager=self)
     self.computers = computers.Computers(manager=self)
@@ -55,7 +55,7 @@ class Manager(core.CoreApi):
     """
     try:
       self.sign_out()
-    except Exception, err: pass
+    except Exception as err: pass
 
   def __str__(self):
     """
@@ -117,7 +117,7 @@ class Manager(core.CoreApi):
 
   @prefix.setter
   def prefix(self, value):
-    if not value or not type(value) in [type(''), type(u'')]: value = ""
+    if not value or type(value) != type(""): value = ""
     self._prefix = value
 
   # *******************************************************************
@@ -144,7 +144,7 @@ class Manager(core.CoreApi):
 
     Path checked is ( via os.path.expanduser(path) ):
       ~/.deepsecurity/credentials
-      C:\Users\USERNAME\.deepsecurity\credentials
+      C:\\Users\\USERNAME\.deepsecurity\credentials
 
     !!! Remember that by storing credentials on the local disk you are increasing the
         risk of compromise as you've expanded the attack surface. If an attacker gains
@@ -168,9 +168,9 @@ class Manager(core.CoreApi):
           for line in fh:
             m = credential_line_pattern.search(line)
             if m:
-              if not credentials.has_key(m.group('key')): credentials[m.group('key')] = None
+              if m.group('key') not in credentials: credentials[m.group('key')] = None
               credentials[m.group('key')] = m.group('val')
-      except Exception, err:
+      except Exception as err:
         self.log("Could not read and process local credentials file.", err=err)
 
       # verify credentials
@@ -180,7 +180,7 @@ class Manager(core.CoreApi):
             try:
               setattr(self, "_{}".format(k), v)
               self.log("Loaded {} from local credentials file".format(k))
-            except Exception, err:
+            except Exception as err:
               self.log("Unable to load {} from local credentials file".format(k))
   
   def sign_in(self):
@@ -276,7 +276,7 @@ class Manager(core.CoreApi):
     result = None
     soap_call = self._get_request_format(call='getManagerTime')
     response = self._request(soap_call, auth_required=False)
-    if response and response['status'] == 200 and response['data'].has_key('#text'):
+    if response and response['status'] == 200 and '#text' in response['data']:
       result = datetime.datetime.strptime(response['data']['#text'], "%Y-%m-%dT%H:%M:%S.%fZ")
   
     return result
@@ -430,7 +430,7 @@ class Manager(core.CoreApi):
       if response and response['status'] == 200:
         # response contains the internal rule ID
         for internal_rule_id in response['data']:
-          if internal_rule_id == u'@xmlns': continue
+          if internal_rule_id == '@xmlns': continue
           results[rule_key].append(internal_rule_id)
           results['total_recommedations'] += 1
 

@@ -122,7 +122,7 @@ class Computers(core.CoreDict):
         computer_obj = None
         try:
           computer_obj = Computer(self.manager, computer, self.log)
-        except Exception, err:
+        except Exception as err:
           self.log("Could not create Computer from API response")
         if computer_obj:
           self[computer_obj.id] = computer_obj
@@ -131,19 +131,19 @@ class Computers(core.CoreDict):
           try:
             # add this computer to any appropriate groups on the Manager()
             if 'computer_group_id' in dir(computer_obj) and computer_obj.computer_group_id:
-              if self.manager.computer_groups and self.manager.computer_groups.has_key(computer_obj.computer_group_id):
+              if self.manager.computer_groups and computer_obj.computer_group_id in self.manager.computer_groups:
                 self.manager.computer_groups[computer_obj.computer_group_id].computers[computer_obj.id] = computer_obj
                 self.log("Added Computer {} to ComputerGroup {}".format(computer_obj.id, computer_obj.computer_group_id), level='debug')
-          except Exception, hostGroupid_err:
+          except Exception as hostGroupid_err:
             self.log("Could not add Computer {} to ComputerGroup".format(computer_obj.id), err=hostGroupid_err)
 
           try: 
             # add this computer to any appropriate policies on the Manager()
             if 'policy_id' in dir(computer_obj) and computer_obj.policy_id:
-              if self.manager.policies and self.manager.policies.has_key(computer_obj.policy_id):
+              if self.manager.policies and computer_obj.policy_id in self.manager.policies:
                 self.manager.policies[computer_obj.policy_id].computers[computer_obj.id] = computer_obj
                 self.log("Added Computer {} to Policy {}".format(computer_obj.id, computer_obj.policy_id), level='debug')
-          except Exception, securityProfileid_err:
+          except Exception as securityProfileid_err:
             self.log("Could not add Computer {} to Policy".format(computer_obj.id), err=securityProfileid_err)
 
     return len(self)

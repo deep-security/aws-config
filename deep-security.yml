@@ -64,7 +64,7 @@ Resources:
         for more details.
       Handler: dsDoesInstanceHavePolicy.aws_config_rule_handler
       Role: !GetAtt dsConfigRuleRole.Arn
-      Runtime: python2.7
+      Runtime: python3.7
       Timeout: 60
   dsDoesInstanceHavePolicyLambdaPermission:
     Type: AWS::Lambda::Permission
@@ -81,7 +81,7 @@ Resources:
         See https://github.com/deep-security/aws-config for more details.
       Handler: dsIsInstanceClear.aws_config_rule_handler
       Role: !GetAtt dsConfigRuleRole.Arn
-      Runtime: python2.7
+      Runtime: python3.7
       Timeout: 60
   dsIsInstanceClearLambdaPermission:
     Type: AWS::Lambda::Permission
@@ -98,7 +98,7 @@ Resources:
         See https://github.com/deep-security/aws-config for more details.
       Handler: dsIsInstanceProtectedBy.aws_config_rule_handler
       Role: !GetAtt dsConfigRuleRole.Arn
-      Runtime: python2.7
+      Runtime: python3.7
       Timeout: 60
   dsIsInstanceProtectedByLambdaPermission:
     Type: AWS::Lambda::Permission
@@ -115,7 +115,7 @@ Resources:
         control. See https://github.com/deep-security/aws-config for more details.
       Handler: dsIsInstanceProtectedByAntiMalware.aws_config_rule_handler
       Role: !GetAtt dsConfigRuleRole.Arn
-      Runtime: python2.7
+      Runtime: python3.7
       Timeout: 60
   dsIsInstanceProtectedByAntiMalwareLambdaPermission:
     Type: AWS::Lambda::Permission

@@ -28,7 +28,7 @@ class Policies(core.CoreDict):
           try:
             self[policy_obj.id] = policy_obj
             self.log("Added Policy {}".format(policy_obj.id), level='debug')
-          except Exception, err:
+          except Exception as err:
             self.log("Could not add Policy {}".format(policy_obj), level='warning', err=err)
 
     return len(self)
@@ -104,12 +104,12 @@ class Policies(core.CoreDict):
              'DPIState': intrusion_prevention_state,
              'ID': None,
              'antiMalwareManualID': None,
-             'antiMalwareManualInherit': u'true',
+             'antiMalwareManualInherit': 'true',
              'antiMalwareRealTimeID': None,
-             'antiMalwareRealTimeInherit': u'true',
+             'antiMalwareRealTimeInherit': 'true',
              'antiMalwareRealTimeScheduleID': None,
              'antiMalwareScheduledID': None,
-             'antiMalwareScheduledInherit': u'true',
+             'antiMalwareScheduledInherit': 'true',
              'antiMalwareState': anti_malware_state,
              'applicationTypeIDs': None,
              'description': description,
@@ -135,7 +135,7 @@ class Policies(core.CoreDict):
           self[new_policy.id] = new_policy
           result = new_policy.id
           self.log("Added new policy #{}".format(new_policy.id))
-      except Exception, err:
+      except Exception as err:
         self.log("Could not create new policy from API response", err=err)
     else:
       result = False
@@ -178,7 +178,7 @@ class Rules(core.CoreDict):
             if rule_obj:
               if rule_key == 'intrusion_prevention' and rule_obj.cve_numbers:
                 rule_obj.cve_numbers = rule_obj.cve_numbers.split(', ')
-                if type(rule_obj.cve_numbers) in [type(''), type(u'')]: rule_obj.cve_numbers = [ rule_obj.cve_numbers ]
+                if type(rule_obj.cve_numbers) == type(''): rule_obj.cve_numbers = [ rule_obj.cve_numbers ]
                 
               rule_id = '{}-{: >10}'.format(rule_key, i)
               if 'id' in dir(rule_obj): rule_id = rule_obj.id
@@ -239,7 +239,7 @@ class Policy(core.CoreObject):
     soap_call = self.manager._get_request_format(call='securityProfileSave')
     soap_call['data'] = { 'sp': self.to_dict() }
 
-    if soap_call['data']['sp'].has_key('manager'):
+    if 'manager' in soap_call['data']['sp']:
       del(soap_call['data']['sp']['manager'])
 
     response = self.manager._request(soap_call)
