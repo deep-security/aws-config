@@ -7,42 +7,42 @@ executors:
 
 commands:
   install-test-suite:
-    description: Install boto3, pytest
+    description: Install testing packages
     steps:
       - restore_cache:
           keys:
-            - cache-test-suite-20190725
+            - cache-test-{{ checksum "requirements-test.txt" }}
 
       - run:
-          name: Installing test suite
+          name: Installing testing packages
           command: |
             python -m venv venv
             . venv/bin/activate
-            pip install boto3 pytest
+            pip install -r requirements-test.txt
 
       - save_cache:
           paths:
             - ./venv
-          key: cache-test-suite-20190725
+          key: cache-test-{{ checksum "requirements-test.txt" }}
 
   install-sam:
     description: Install AWS SAM
     steps:
       - restore_cache:
           keys:
-            - cache-sam-20190725
+            - cache-sam-{{ checksum "requirements-sam-cli.txt" }}
 
       - run:
           name: Installing AWS SAM CLI
           command: |
             python -m venv venv
             . venv/bin/activate
-            pip install awscli aws-sam-cli
+            pip install -r requirements-sam-cli.txt
 
       - save_cache:
           paths:
             - ./venv
-          key: cache-sam-20190725
+          key: cache-sam-{{ checksum "requirements-sam-cli.txt" }}
 
 jobs:
   unit-tests:
@@ -110,6 +110,8 @@ jobs:
     executor: python37-executor
 
     steps:
+      - checkout
+
       - attach_workspace:
           at: circleci-ws
 
@@ -139,6 +141,8 @@ jobs:
     executor: python37-executor
 
     steps:
+      - checkout
+
       - attach_workspace:
           at: circleci-ws
 
