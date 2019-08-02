@@ -83,9 +83,9 @@ def aws_config_rule_handler(event, context):
             for comp_id, details in mgr.computers.items():
                 if details.cloud_object_instance_id and (details.cloud_object_instance_id.lower().strip() == instance_id.lower().strip()):
                     print("Found matching computer. Deep Security #{}".format(comp_id))
-                    detailed_msg = "Current status: {}".format(details.status_light)
+                    detailed_msg = "Current status: {}".format(details.computer_light)
                     print(detailed_msg)
-                    if details.status_light.lower() == 'green':
+                    if details.computer_light.lower() == 'green':
                         is_clear = True
 
             mgr.sign_out() # gracefully clean up our Deep Security session

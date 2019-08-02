@@ -29,8 +29,8 @@ class Terms(object):
                     term_new = re.sub('dpi', '_intrusion_prevention_', term_new, re.IGNORECASE)
                 if 'host' in term_new:
                     term_new = re.sub('host', '_computer_', term_new, re.IGNORECASE)
-                if 'securityprofile' in term_new:
-                    term_new = re.sub('securityprofile', '_policy_', term_new, re.IGNORECASE)
+                if 'security_profile' in term_new:
+                    term_new = re.sub('security_profile', '_policy_', term_new, re.IGNORECASE)
                 if 'integrity' in term_new:
                     term_new = re.sub('((?=integrity(?!_monitoring)))', '_integrity_monitoring_', term_new, re.IGNORECASE)
                     term_new = term_new.replace('integrity_monitoring_integrity', 'integrity_monitoring')

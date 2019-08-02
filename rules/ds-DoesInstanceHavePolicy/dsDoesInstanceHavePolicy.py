@@ -89,7 +89,7 @@ def aws_config_rule_handler(event, context):
                     print("Found matching computer. Deep Security #{}".format(comp_id))
                     detailed_msg = "Current policy: {}".format(details.policy_name)
                     print(detailed_msg)
-                    if details.policy_name.lower() == event['ruleParameters']['dsPolicy']:
+                    if details.policy_name.lower() == event['ruleParameters']['dsPolicy'].lower():
                         has_policy = True
 
             mgr.sign_out() # gracefully clean up our Deep Security session
