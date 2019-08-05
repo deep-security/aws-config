@@ -7,13 +7,13 @@ from src.deepsecurity.credentials import Credentials
 def test_get_username(mock_client):
     ssm = MagicMock()
     ssm.get_parameter.return_value = {
-        u'Parameter': {
-            u'ARN': u'arn:aws:ssm:us-west-1:000000000000:parameter/ds/api_user',
-            u'LastModifiedDate': datetime.datetime(2019, 7, 23, 15, 43, 26, 375000),
-            u'Name': u'/ds/api_user',
-            u'Type': u'SecureString',
-            u'Value': u'admin',
-            u'Version': 1
+        'Parameter': {
+            'ARN': u'arn:aws:ssm:us-west-1:000000000000:parameter/ds/api_user',
+            'LastModifiedDate': datetime.datetime(2019, 7, 23, 15, 43, 26, 375000),
+            'Name': u'/ds/api_user',
+            'Type': u'SecureString',
+            'Value': u'admin',
+            'Version': 1
         }
     }
     mock_client.return_value = ssm
@@ -28,13 +28,13 @@ def test_get_username(mock_client):
 def test_get_password(mock_client):
     ssm = MagicMock()
     ssm.get_parameter.return_value = {
-        u'Parameter': {
-            u'ARN': u'arn:aws:ssm:us-west-1:000000000000:parameter/ds/api_password',
-            u'LastModifiedDate': datetime.datetime(2019, 7, 23, 15, 43, 26, 375000),
-            u'Name': u'/ds/api_password',
-            u'Type': u'SecureString',
-            u'Value': u'password',
-            u'Version': 1
+        'Parameter': {
+            'ARN': u'arn:aws:ssm:us-west-1:000000000000:parameter/ds/api_password',
+            'LastModifiedDate': datetime.datetime(2019, 7, 23, 15, 43, 26, 375000),
+            'Name': u'/ds/api_password',
+            'Type': u'SecureString',
+            'Value': u'password',
+            'Version': 1
         }
     }
     mock_client.return_value = ssm
