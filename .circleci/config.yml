@@ -163,6 +163,9 @@ workflows:
       - package:
           requires:
             - unit-tests
+          filters:
+            branches:
+              only: master
       - deploy:
           requires:
             - package
@@ -176,6 +179,9 @@ workflows:
       - package:
           requires:
             - unit-tests
+          filters:
+            branches:
+              only: master
       - publish:
           requires:
             - package
