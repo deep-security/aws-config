@@ -1,9 +1,8 @@
-[![CircleCI](https://circleci.com/gh/stelligent/deep-security.svg?style=svg)](https://circleci.com/gh/stelligent/deep-security)
+[![Build Status](https://circleci.com/gh/stelligent/deep-security.svg?style=shield)](https://circleci.com/gh/stelligent/deep-security)
 
 # AWS Config Rules for Deep Security
 
 A set of AWS Config Rules to help ensure that your AWS deployments are leveraging the protection of Deep Security. These rules help centralize your compliance information in one place, AWS Config.
-
 
 
 ## Table of Contents
@@ -36,6 +35,13 @@ You should set up a dedicated use account for API access. To configure the accou
 
 ### Deploy AWS Lambda and Config rules
 
+#### With [circleci](https://circleci.com/)
+
+> Configuration settings - `circleci` project
+>
+> - Add variables from `deploy.config` as `Environment Variables` in `circleci` project
+> - Add AWS credentials and region information as `Environment Variables` in `circleci` project
+
 #### From command line
 
 > Configuration settings - `deploy.config`
@@ -59,8 +65,7 @@ You should set up a dedicated use account for API access. To configure the accou
 > Prerequisite
 >
 > - AWS SAM CLI command line tools ([instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
-> - Properly configured AWS credentials locally for executing AWS CLI
-> - Python 2.7
+> - Python 3.7
 >
 > Steps
 >
@@ -68,18 +73,11 @@ You should set up a dedicated use account for API access. To configure the accou
 >
 > Unit Tests
 >
-> - Run `pytest -s -vv tests/unit`
+> - Run `pytest -s -vv`
 >
 > Publish to AWS Serverless Application Repository
 >
 > - Run `./publish.sh`
-
-#### With [circleci](https://circleci.com/)
-
-> Configuration settings - `circleci` project
->
-> - Add variables from `deploy.config` as `Environment Variables` in `circleci` project
-> - Add AWS credentials and region information as `Environment Variables` in `circleci` project
 
 
 ### Rules

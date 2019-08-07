@@ -46,14 +46,14 @@ Metadata:
     Name: Deep-Security-Config-Rules
     Description: A set of AWS Config Rules to help ensure that your AWS deployments are leveraging the protection of Deep Security.
       These rules help centralize your compliance information in one place, AWS Config.
-    Author: Stelligent
+    Author: Trend Micro
     SpdxLicenseId: Apache-2.0
     LicenseUrl: LICENSE
     ReadmeUrl: README.md
     Labels: ['trendmicro', 'deepsecurity', 'security', 'config']
-    HomePageUrl: https://github.com/stelligent/deep-security
+    HomePageUrl: https://github.com/deep-security/aws-config
     SemanticVersion: 0.0.1
-    SourceCodeUrl: https://github.com/stelligent/deep-security
+    SourceCodeUrl: https://github.com/deep-security/aws-config
 Resources:
   dsDoesInstanceHavePolicyLambda:
     Type: AWS::Serverless::Function
