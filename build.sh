@@ -5,13 +5,13 @@ set -e
 echo ""
 echo "Running unit tests..."
 
-pytest -s -vv tests/unit
+pytest -s -vv
 
 echo ""
 echo "Copying dependencies..."
 
 for i in rules/*; do
-  cp -r src tests requirements.txt $i
+  cp -r src requirements.txt $i
 done
 
 echo ""

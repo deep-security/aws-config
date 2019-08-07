@@ -1,0 +1,150 @@
+{
+    "2": {
+        "anti_malware_classic_pattern_version": "15.279.00",
+        "anti_malware_engine_version": "N/A",
+        "anti_malware_intelli_trap_exception_version": "1.631.00",
+        "anti_malware_intelli_trap_version": "0.251.00",
+        "anti_malware_smart_scan_pattern_version": "15.277.00",
+        "anti_malware_spyware_pattern_version": "2.199.00",
+        "cloud_object_image_id": "ami-0c7a4976cb6fafd3a",
+        "cloud_object_instance_id": "i-03f48756b2e392fca",
+        "cloud_object_internal_unique_id": "i-03f48756b2e392fca",
+        "cloud_object_security_group_ids": null,
+        "cloud_object_type": "AMAZON_VM",
+        "component_klasses": null,
+        "component_names": null,
+        "component_types": null,
+        "component_versions": null,
+        "computer_group_id": "35",
+        "computer_group_name": "Computers > stelligentlabs - 000000000000 > EU (Ireland) > kubernetes-vpc-VPC (vpc-0f9ca9cd8f25a420e) > kubernetes-vpc-Subnet02 (subnet-016c57baf66a86747)",
+        "computer_light": "GREEN",
+        "computer_type": "STANDARD",
+        "description": null,
+        "display_name": "kube-twistlock-nodegroup-Node",
+        "external": "true",
+        "external_id": null,
+        "hostInterfaces": null,
+        "id": 2,
+        "last_anit_malware_scheduled_scan": null,
+        "last_anti_malware_event": null,
+        "last_anti_malware_manual_scan": null,
+        "last_firewall_event": null,
+        "last_integrity_monitoring_event": null,
+        "last_intrusion_prevention_event": null,
+        "last_ipused": null,
+        "last_log_inspection_event": null,
+        "last_web_reputation_event": null,
+        "light": "0",
+        "locked": "false",
+        "manager": {
+            "API_TYPE_REST": "REST",
+            "API_TYPE_SOAP": "SOAP",
+            "_hostname": "0.0.0.0",
+            "_log_at_level": 30,
+            "_password": "xxxxxx",
+            "_port": "443",
+            "_prefix": "",
+            "_rest_api_endpoint": "https://0.0.0.0:443/rest",
+            "_soap_api_endpoint": "https://0.0.0.0:443/webservice/Manager",
+            "_tenant": null,
+            "_username": "xxxxxx",
+            "cloud_accounts": {
+                "__dict__": {
+                    "_exempt_from_find": [],
+                    "manager": {
+                        "py/id": 2
+                    }
+                },
+                "py/object": "environments.CloudAccounts"
+            },
+            "computer_groups": {
+                "__dict__": {
+                    "_exempt_from_find": [
+                        "computers"
+                    ],
+                    "computers": {
+                        "__dict__": {
+                            "_exempt_from_find": []
+                        },
+                        "py/object": "core.CoreDict"
+                    },
+                    "manager": {
+                        "py/id": 2
+                    }
+                },
+                "py/object": "computers.ComputerGroups"
+            },
+            "computers": {
+                "py/id": 0
+            },
+            "ignore_ssl_validation": 1,
+            "ip_lists": {
+                "__dict__": {
+                    "_exempt_from_find": [],
+                    "manager": {
+                        "py/id": 2
+                    }
+                },
+                "py/object": "policies.IPLists"
+            },
+            "logger": {
+                "py/reduce": [
+                    {
+                        "py/function": "logging.getLogger"
+                    },
+                    {
+                        "py/tuple": [
+                            "DeepSecurity.API"
+                        ]
+                    }
+                ]
+            },
+            "policies": {
+                "__dict__": {
+                    "_exempt_from_find": [],
+                    "manager": {
+                        "py/id": 2
+                    }
+                },
+                "py/object": "policies.Policies"
+            },
+            "py/object": "src.deepsecurity.dsm.Manager",
+            "rules": {
+                "__dict__": {
+                    "_exempt_from_find": [],
+                    "manager": {
+                        "py/id": 2
+                    }
+                },
+                "py/object": "policies.Rules"
+            }
+        },
+        "name": "ec2-0-0-0-0.eu-west-1.compute.amazonaws.com",
+        "overall_anti_malware_status": "Anti-Malware: On, Real Time",
+        "overall_firewall_status": "Firewall: On, 8 rules",
+        "overall_integrity_monitoring_status": "Integrity Monitoring: Not Licensed",
+        "overall_intrusion_prevention_status": "Intrusion Prevention: Not Licensed",
+        "overall_last_recommendation_scan": null,
+        "overall_last_successful_communication": null,
+        "overall_last_successful_update": null,
+        "overall_last_update_required": "2019-08-06T13:39:28.800Z",
+        "overall_log_inspection_status": "Log Inspection: Off, not installed, no rules",
+        "overall_status": "Managed (Online)",
+        "overall_version": "N/A",
+        "overall_web_reputation_status": "Web Reputation: Off, not installed",
+        "platform": "Unknown (64 bit)",
+        "policy_id": null,
+        "policy_name": "Linux Server",
+        "py/object": "computers.Computer",
+        "recommended_rules": null,
+        "virtual_name": null,
+        "virtual_uuid": null
+    },
+    "__dict__": {
+        "_exempt_from_find": [],
+        "manager": {
+            "py/id": 2
+        }
+    },
+    "py/object": "computers.Computers"
+}

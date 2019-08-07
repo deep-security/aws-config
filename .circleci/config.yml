@@ -57,7 +57,7 @@ jobs:
           name: Running unit tests
           command: |
             . venv/bin/activate
-            pytest -s -vv tests/unit
+            pytest -s -vv --cov=src/rules/
 
   package:
     executor: python37-executor

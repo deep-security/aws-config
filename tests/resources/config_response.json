@@ -1,0 +1,15 @@
+{
+    "FailedEvaluations": [],
+    "ResponseMetadata": {
+        "RequestId": "7964b119-ea29-46d1-86c5-b5def3e85b13",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amzn-requestid": "7964b119-ea29-46d1-86c5-b5def3e85b13",
+            "strict-transport-security": "max-age=86400",
+            "content-type": "application/x-amz-json-1.1",
+            "content-length": "24",
+            "date": "Tue, 06 Aug 2019 16:54:08 GMT"
+        },
+        "RetryAttempts": 0
+    }
+}
