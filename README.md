@@ -82,7 +82,7 @@ To publish to AWS Serverless Application Repository
 `./publish.sh`
 
 
-#### [circleci](https://circleci.com/) Configuration
+## [circleci](https://circleci.com/) Configuration
 
 This project is managed by a CircleCI CI loop. It does require some configuration be set up to do so, though.
 
