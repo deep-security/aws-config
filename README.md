@@ -20,15 +20,15 @@ During execution, the AWS Lambda functions will query the Deep Security API. To 
 
 You should set up a dedicated use account for API access. To configure the account with the minimum privileges (which reduces the risk if the credentials are exposed) required by this integration, follow the steps below.
 
-1. In Deep Security, go to *Administration > User Manager > Roles*. 
+1. In Deep Security, go to *Administration* > *User Manager* > *Roles*. 
 1. Click **New**. Create a new role with a unique, meaningful name.
 1. Under **Access Type**, select **Allow Access to web services API**.
 1. Under **Access Type**, deselect **Allow Access to Deep Security Manager User Interface**.
 1. On the **Computer Rights** tab, select either **All Computers** or **Selected Computers**, ensuring that only the greyed-out **View** right (under **Allow Users to**) is selected.
 1. On the **Policy Rights** tab, select **Selected Policies**. Verify that no policies are selected. (The role does not grant rights for any policies.)
 1. On the **User Rights** tab, select **Change own password and contact information only**.
-1. On the **Other Rights* tab, verify that the default options remain, with only **View-Only** and **Hide** permissions.
-1. Go to **Administration > User Manager > Users**.
+1. On the **Other Rights** tab, verify that the default options remain, with only **View-Only** and **Hide** permissions.
+1. Go to **Administration** > **User Manager** > **Users**.
 1. Click **New**. Create a new user with a unique, meaningful name.
 1. Select the role that you created in the previous section.
 
@@ -44,14 +44,51 @@ described below.
 
 ### Deploy AWS Lambda and Config rules
 
-You have 2 ways to deploy this project - with 'circleci' in an automated way or with running shell scripts
-from command line.
+This project is designed be deployed via several Bash scripts, but certain configuration needs to be in place fist.
 
-#### With [circleci](https://circleci.com/)
+Environment variables file - `deploy.config`
 
-> - Create an account with `circleci` if you don't have one.
-> - In `circleci`, add this project (or your copy).
-> - In `project settings` of added project, `environment variables` section, add the following variables:
+> - `STACK_NAME`: CloudFormation stack name for all lambda and Config rule resources
+> - `LAMBDA_BUCKET`: S3 bucket name where Lambda source code is uploaded
+> - `LAMBDA_PREFIX`: S3 object prefix within `LAMBDA_BUCKET`
+> - `CONFIG_BUCKET`: S3 bucket name where AWS Config to store history and files
+> - `CONFIG_PREFIX`: S3 object prefix within `CONFIG_BUCKET`
+> - `DS_HOSTNAME`: Deep Security Manager host name
+> - `DS_PORT`: (optional) Deep Security Manager host port (default: 443)
+> - `DS_TENANT`: (optional) Deep Security tenant name (default: '')
+> - `DS_IGNORE_SSL_VALIDATION`: (optional) Whether to validate SSL connection to Deep Security Manager (default: false)
+> - `DS_USERNAME_PARAM_STORE_KEY`: SSM Parameter Store key to retrieve Deep Security username
+> - `DS_PASSWORD_PARAM_STORE_KEY`: SSM Parameter Store key to retrieve Deep Security password
+> - `DS_POLICY`: Policy name to check used by `DoesInstanceHavePolicy` Lambda
+> - `DS_CONTROL`: Control name to check used by `IsInstanceProtectedBy` Lambda (Allowed values are
+> [ anti_malware, web_reputation, firewall, intrusion_prevention, integrity_monitoring, log_inspection ])
+
+Dependencies
+
+- Python 3.7
+- AWS SAM CLI command line tools ([instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
+- AWS credentials correctly configured. ([instructions](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html))
+
+To deploy
+
+`./deploy.sh`
+
+To run unit tests
+
+`pytest -s -vv`
+
+To publish to AWS Serverless Application Repository
+
+`./publish.sh`
+
+
+#### [circleci](https://circleci.com/) Configuration
+
+This project is managed by a CircleCI CI loop. It does require some configuration be set up to do so, though.
+
+- Create an account with `circleci` if you don't have one.
+- In `circleci`, add this project (or your copy).
+- In `project settings` of added project, `environment variables` section, add the following variables:
 >   - `STACK_NAME`: CloudFormation stack name for all lambda and Config rule resources
 >   - `LAMBDA_BUCKET`: S3 bucket name where Lambda source code is uploaded
 >   - `LAMBDA_PREFIX`: S3 object prefix within `LAMBDA_BUCKET`
@@ -70,46 +107,8 @@ from command line.
 >   - `AWS_SECRET_ACCESS_KEY`: Your AWS secret access key
 >   - `AWS_SESSION_TOKEN`: (optional) Session token if you need one to access AWS
 >   - `AWS_DEFAULT_REGION`: AWS region to deploy into
-> - Done. Now when you push into your GitHub repository, `circleci` deployment will be triggered automatically.
->   Configuration settings for `circleci` are located at `.circleci/config.yml`.
-
-#### From command line
-
-> Environment variables file - `deploy.config`
->
-> - `STACK_NAME`: CloudFormation stack name for all lambda and Config rule resources
-> - `LAMBDA_BUCKET`: S3 bucket name where Lambda source code is uploaded
-> - `LAMBDA_PREFIX`: S3 object prefix within `LAMBDA_BUCKET`
-> - `CONFIG_BUCKET`: S3 bucket name where AWS Config to store history and files
-> - `CONFIG_PREFIX`: S3 object prefix within `CONFIG_BUCKET`
-> - `DS_HOSTNAME`: Deep Security Manager host name
-> - `DS_PORT`: (optional) Deep Security Manager host port (default: 443)
-> - `DS_TENANT`: (optional) Deep Security tenant name (default: '')
-> - `DS_IGNORE_SSL_VALIDATION`: (optional) Whether to validate SSL connection to Deep Security Manager (default: false)
-> - `DS_USERNAME_PARAM_STORE_KEY`: SSM Parameter Store key to retrieve Deep Security username
-> - `DS_PASSWORD_PARAM_STORE_KEY`: SSM Parameter Store key to retrieve Deep Security password
-> - `DS_POLICY`: Policy name to check used by `DoesInstanceHavePolicy` Lambda
-> - `DS_CONTROL`: Control name to check used by `IsInstanceProtectedBy` Lambda (Allowed values are
-> [ anti_malware, web_reputation, firewall, intrusion_prevention, integrity_monitoring, log_inspection ])
->
-> Dependencies
->
-> - Python 3.7
-> - AWS SAM CLI command line tools ([instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
-> - AWS credentials correctly configured. ([instructions](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html))
->
-> To deploy
->
-> - `./deploy.sh`
->
-> To run unit tests
->
-> - `pytest -s -vv`
->
-> To publish to AWS Serverless Application Repository
->
-> - `./publish.sh`
-
+- Done. Now when you push into your GitHub repository, `circleci` deployment will be triggered automatically.
+- **Note:** Configuration settings for `circleci` are located at `.circleci/config.yml`.
 
 ### Rules
 
