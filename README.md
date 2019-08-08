@@ -33,20 +33,49 @@ You should set up a dedicated use account for API access. To configure the accou
 1. Select the role that you created in the previous section.
 
 
+### Manage secrets
+
+Deep Security Config rules utilize AWS SSM Parameter Store and KMS to securely manage credentials. Before deploying
+Deep Security Lambda functions and Config rules, you need to create entries in Parameter Store for above created
+user's username and password. Be sure to select `SecureString` as parameter type and use appropriate KMS 'Customer managed key (CMK)' 
+from your account. These 2 Parameter Store keys will be added as environment variables for deployment process
+described below.
+
+
 ### Deploy AWS Lambda and Config rules
+
+You have 2 ways to deploy this project - with 'circleci' in an automated way or with running shell scripts
+from command line.
 
 #### With [circleci](https://circleci.com/)
 
-> Configuration settings - `circleci` project
->
-> - Add variables from `deploy.config` as `Environment Variables` in `circleci` project
-> - Add AWS credentials and region information as `Environment Variables` in `circleci` project
+> - Create an account with `circleci` if you don't have one.
+> - In `circleci`, add this project (or your copy).
+> - In `project settings` of added project, `environment variables` section, add the following variables:
+>   - `STACK_NAME`: CloudFormation stack name for all lambda and Config rule resources
+>   - `LAMBDA_BUCKET`: S3 bucket name where Lambda source code is uploaded
+>   - `LAMBDA_PREFIX`: S3 object prefix within `LAMBDA_BUCKET`
+>   - `CONFIG_BUCKET`: S3 bucket name where AWS Config to store history and files
+>   - `CONFIG_PREFIX`: S3 object prefix within `CONFIG_BUCKET`
+>   - `DS_HOSTNAME`: Deep Security Manager host name
+>   - `DS_PORT`: (optional) Deep Security Manager host port (default: 443)
+>   - `DS_TENANT`: (optional) Deep Security tenant name (default: '')
+>   - `DS_IGNORE_SSL_VALIDATION`: (optional) Whether to validate SSL connection to Deep Security Manager (default: false)
+>   - `DS_USERNAME_PARAM_STORE_KEY`: SSM Parameter Store key to retrieve Deep Security username
+>   - `DS_PASSWORD_PARAM_STORE_KEY`: SSM Parameter Store key to retrieve Deep Security password
+>   - `DS_POLICY`: Policy name to check used by `DoesInstanceHavePolicy` Lambda
+>   - `DS_CONTROL`: Control name to check used by `IsInstanceProtectedBy` Lambda (Allowed values are
+>   [ anti_malware, web_reputation, firewall, intrusion_prevention, integrity_monitoring, log_inspection ])
+>   - `AWS_ACCESS_KEY_ID`: Your AWS access key ID
+>   - `AWS_SECRET_ACCESS_KEY`: Your AWS secret access key
+>   - `AWS_SESSION_TOKEN`: (optional) Session token if you need one to access AWS
+>   - `AWS_DEFAULT_REGION`: AWS region to deploy into
+> - Done. Now when you push into your GitHub repository, `circleci` deployment will be triggered automatically.
+>   Configuration settings for `circleci` are located at `.circleci/config.yml`.
 
 #### From command line
 
-> Configuration settings - `deploy.config`
->
-> **_Important: These settings must be updated accordingly before deploy_**
+> Environment variables file - `deploy.config`
 >
 > - `STACK_NAME`: CloudFormation stack name for all lambda and Config rule resources
 > - `LAMBDA_BUCKET`: S3 bucket name where Lambda source code is uploaded
@@ -54,30 +83,32 @@ You should set up a dedicated use account for API access. To configure the accou
 > - `CONFIG_BUCKET`: S3 bucket name where AWS Config to store history and files
 > - `CONFIG_PREFIX`: S3 object prefix within `CONFIG_BUCKET`
 > - `DS_HOSTNAME`: Deep Security Manager host name
-> - `DS_PORT`: Deep Security Manager host port
-> - `DS_TENANT`: Deep Security tenant name if there is one
-> - `DS_IGNORE_SSL_VALIDATION`: Whether to validate SSL connection to Deep Security Manager
+> - `DS_PORT`: (optional) Deep Security Manager host port (default: 443)
+> - `DS_TENANT`: (optional) Deep Security tenant name (default: '')
+> - `DS_IGNORE_SSL_VALIDATION`: (optional) Whether to validate SSL connection to Deep Security Manager (default: false)
 > - `DS_USERNAME_PARAM_STORE_KEY`: SSM Parameter Store key to retrieve Deep Security username
 > - `DS_PASSWORD_PARAM_STORE_KEY`: SSM Parameter Store key to retrieve Deep Security password
 > - `DS_POLICY`: Policy name to check used by `DoesInstanceHavePolicy` Lambda
-> - `DS_CONTROL`: Control name to check used by `IsInstanceProtectedBy` Lambda
+> - `DS_CONTROL`: Control name to check used by `IsInstanceProtectedBy` Lambda (Allowed values are
+> [ anti_malware, web_reputation, firewall, intrusion_prevention, integrity_monitoring, log_inspection ])
 >
-> Prerequisite
+> Dependencies
 >
-> - AWS SAM CLI command line tools ([instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
 > - Python 3.7
+> - AWS SAM CLI command line tools ([instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
+> - AWS credentials correctly configured. ([instructions](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html))
 >
-> Steps
+> To deploy
 >
-> - Run `./deploy.sh`
+> - `./deploy.sh`
 >
-> Unit Tests
+> To run unit tests
 >
-> - Run `pytest -s -vv`
+> - `pytest -s -vv`
 >
-> Publish to AWS Serverless Application Repository
+> To publish to AWS Serverless Application Repository
 >
-> - Run `./publish.sh`
+> - `./publish.sh`
 
 
 ### Rules
