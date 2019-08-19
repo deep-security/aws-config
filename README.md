@@ -1,4 +1,3 @@
-[![Build Status](https://circleci.com/gh/stelligent/deep-security.svg?style=shield)](https://circleci.com/gh/stelligent/deep-security)
 
 # AWS Config Rules for Deep Security
 
